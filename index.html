@@ -53,7 +53,7 @@ body.full #deck{border-radius:0;box-shadow:none}
 button{font-family:inherit}
 
 /* ---------- control bar ---------- */
-#bar{position:fixed;left:50%;bottom:20px;width:min(520px,calc(100vw - 24px));transform:translateX(-50%);padding:9px 8px 6px;border-radius:18px;z-index:10;
+#bar{position:fixed;left:50%;bottom:20px;width:min(640px,calc(100vw - 24px));transform:translateX(-50%);padding:9px 8px 6px;border-radius:18px;z-index:10;
   transition:opacity .34s ease,transform .5s var(--ease);font-size:13px;user-select:none;-webkit-user-select:none}
 body.idle #bar{opacity:0;transform:translate(-50%,10px);pointer-events:none}
 #row{display:flex;align-items:center;gap:0;margin-top:4px}
@@ -67,7 +67,9 @@ body.idle #bar{opacity:0;transform:translate(-50%,10px);pointer-events:none}
 #count i{font-style:normal;color:var(--ink-3);font-weight:400}
 
 /* Viewer | Presenter */
-#seg{display:flex;flex:none;padding:2px;margin:0 auto;border-radius:9px;background:rgba(255,255,255,.08)}
+#bstat{display:flex;gap:12px;align-items:center;flex:1;min-width:0;padding:0 10px;overflow:hidden}
+#bstat .st{color:var(--ink-2);font-size:12.5px}
+#seg{display:flex;flex:none;padding:2px;margin:0 6px 0 auto;border-radius:9px;background:rgba(255,255,255,.08)}
 #bar #seg button{width:auto;height:28px;padding:0 12px;border-radius:7px;font-size:13px;font-weight:500;color:var(--ink-2);display:block;line-height:28px}
 #bar #seg button:hover{background:none;color:var(--ink)}
 #bar #seg button.on{background:rgba(255,255,255,.2);color:#fff}
@@ -156,6 +158,8 @@ button.rowi:focus-visible{outline:2px solid var(--tint);outline-offset:-2px}
 .btn.primary:hover{background:#fff}
 .btn:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
 .btn[hidden]{display:none}
+#clkrow .val{margin-left:auto}
+#clkfind[hidden]{display:none}
 #mreset{display:block;margin:14px auto 0;font-size:13px;color:var(--ink-3)}
 #mreset:hover{color:var(--ink-2)}
 
@@ -206,7 +210,9 @@ body.presenter .slide,body.presenter .slide.active{transition:none!important}
 body.presenter #stage{right:40%;top:68px;bottom:92px}
 body.presenter #deck{border-radius:10px}
 body.presenter #bar{left:30%;bottom:18px;background:none;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none}
-body.presenter #notes{display:none}
+body.presenter #notes,body.presenter #bstat{display:none}
+body.presenter #bar{width:min(520px,calc(60vw - 32px))}
+body.presenter #seg{margin:0 auto}
 body.presenter #phead{display:flex;position:fixed;left:0;right:0;top:0;height:68px;align-items:center;gap:22px;padding:0 28px 0 32px;color:var(--ink)}
 #timer{all:unset;cursor:pointer;font-size:32px;font-weight:300;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
 #timer.paused{color:var(--ink-3)}
@@ -216,8 +222,18 @@ body.presenter #phead{display:flex;position:fixed;left:0;right:0;top:0;height:68
 #pfs[hidden]{display:none}
 #pfs:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
 #pstat{display:flex;align-items:center;gap:16px;flex:none}
-#pdevs{display:flex;gap:16px}
-#pdevs:empty{display:none}
+#pdevs,#pclk{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:16px;font-size:14px;color:var(--ink-2);white-space:nowrap}
+#pclk{gap:8px}
+#pdevs:focus-visible,#pclk:focus-visible{outline:2px solid var(--tint);outline-offset:3px}
+#pdevs .st,#pclk{font-size:14px;color:var(--ink-2)}
+#pdevs .st{gap:8px}
+#pclk i,#pdevs i{width:8px;height:8px}
+#pdevs .st.on,#pclk.on{color:var(--ink)}
+#pclk i{border-radius:50%;box-shadow:inset 0 0 0 1.2px var(--ink-3)}
+#pclk.on i{background:#30d158;box-shadow:none}
+#pdevs .st i{box-shadow:inset 0 0 0 1.2px var(--ink-3);background:none}
+#pdevs .st.on i{background:#30d158;box-shadow:none}
+#pclk.ping i{animation:stping .6s var(--ease)}
 .st{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--ink-3);white-space:nowrap}
 .st i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2)}
 .st.on{color:var(--ink-2)}
@@ -238,7 +254,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
 
 /* ---------- small screens ---------- */
 @media (max-width:720px){
-  #seg,#bar #bpres{display:none}
+  #seg,#bstat,#bar #bpres{display:none}
   #row{justify-content:space-between}
   #count{flex:1}
   #deck{border-radius:8px}
@@ -755,8 +771,8 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   <div id="rehearse"></div>
   <button id="pfs" hidden>Fill screen</button>
   <div id="pstat">
-    <span id="pdevs"></span>
-    <span id="pclk" class="st"><i></i>Clicker</span>
+    <button id="pdevs" title="Phone remote"></button>
+    <button id="pclk" title="Clicker"></button>
     <button id="pgear" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3.500v2.200M12 18.300v2.200M3.500 12h2.200M18.300 12h2.200M6 6l1.550 1.550M16.450 16.450 18 18M6 18l1.550-1.550M16.450 7.550 18 6"/></svg></button>
   </div>
 </header>
@@ -777,7 +793,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     </div>
     <div class="group">
       <button class="rowi" id="rowremote"><span>Phone remote</span><span class="val chev" id="remval">Off</span></button>
-      <div class="rowi" id="clkrow"><span>Clicker</span><span class="val" id="clkstate">Press a button to test</span></div>
+      <div class="rowi" id="clkrow"><span>Clicker</span><span class="val" id="clkstate"></span><div class="mini"><button id="clkfind">Detect</button></div></div>
     </div>
     <div class="group" id="prow">
       <div class="rowi"><span>Timer</span><div class="mini"><button id="tpause">Pause</button><button id="treset">Reset</button></div></div>
@@ -835,6 +851,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     <button id="bprev" aria-label="Previous slide"><svg viewBox="0 0 24 24"><path d="M14.500 5.500 8 12l6.500 6.500"/></svg></button>
     <span id="count"></span>
     <button id="bnext" aria-label="Next slide"><svg viewBox="0 0 24 24"><path d="M9.500 5.500 16 12l-6.500 6.500"/></svg></button>
+    <div id="bstat"></div>
     <div id="seg" role="group" aria-label="Mode">
       <button data-m="viewer">Viewer</button>
       <button data-m="presenter">Presenter</button>
@@ -1201,7 +1218,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   $('pfs').onclick = fullscreenSlides;
   // With the setting on, the first key or clicker press fills the display and does not also change slide.
   addEventListener('keydown', e => {
-    noteClicker(e);
+    if (noteClicker(e)) return;
     if (!autoFull || e.key === 'Escape' || !pw || pw.closed || !slidesOn || slidesFull) return;
     fullscreenSlides();
     if (!firstPressUsed && NEXT_KEYS.includes(e.key)) { firstPressUsed = true; e.preventDefault(); e.stopImmediatePropagation(); }
@@ -1292,7 +1309,13 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   };
   function renderDevices() {
     const list = [...devices];
-    $('pdevs').replaceChildren(...list.map(([id, d]) => statusItem(id, d)));
+    const here = list.map(([id, d]) => {
+      const s = statusItem(id, d);
+      s.lastChild.textContent = `${d.name} ${isQuiet(id, d) ? 'not responding' : 'connected'}`;
+      return s;
+    });
+    if (!here.length) { const s = document.createElement('span'); s.className = 'st'; s.append(document.createElement('i'), 'Phone not connected'); here.push(s); }
+    $('pdevs').replaceChildren(...here);
     $('rdevs').replaceChildren(...list.map(([id, d]) => {
       const row = document.createElement('div'); row.className = 'rowi';
       const name = document.createElement('span'); name.textContent = d.name;
@@ -1311,21 +1334,57 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     list.forEach(([, d]) => { d.fresh = false; });
     renderClicker();
   }
-  // a clicker is plugged into the computer, so it has its own indicator, apart from the remotes
-  let clickerAt = 0, clickerFresh = false;
+  // A clicker is plugged into the computer, so it has its own indicator, apart from the remotes.
+  // Three ways to recognise one: USB identity (WebHID), keys only clickers send, and how brief a press is.
+  let clickerAt = 0, clickerFresh = false, hidDev = null, pairing = false, pairT;
+  const clickerName = () => hidDev?.productName || 'Clicker';
   function renderClicker() {
-    const on = !!clickerAt;
-    $('clkstate').textContent = on ? 'Detected' : 'Press a button to test';
-    $('clkstate').classList.toggle('ok', on);
-    $('pclk').className = 'st' + (on ? ' on' : '') + (clickerFresh ? ' ping' : '');
-    $('pclk').title = on ? 'Clicker detected' : 'No clicker detected yet';
+    const on = !!clickerAt || !!hidDev;
+    $('clkstate').textContent = pairing ? 'Press forward on the clicker' : hidDev ? clickerName() : on ? 'Detected' : 'Not detected';
+    $('clkstate').classList.toggle('ok', on && !pairing);
+    $('clkfind').hidden = on && !pairing;
+    $('pclk').className = (on ? 'on' : '') + (clickerFresh ? ' ping' : '');
+    $('pclk').replaceChildren(document.createElement('i'), on ? `${clickerName()} connected` : 'Clicker not detected');
+    const st = [...devices].map(([id, d]) => statusItem(id, d));
+    if (on) { const c = document.createElement('span'); c.className = 'st on' + (clickerFresh ? ' ping' : ''); c.append(document.createElement('i'), clickerName()); st.unshift(c); }
+    $('bstat').replaceChildren(...st);
     clickerFresh = false;
   }
   function seeClicker() {
-    if (!clickerAt) flash('Clicker detected');
+    if (!clickerAt && !hidDev) flash('Clicker detected');
     clickerAt = Date.now(); clickerFresh = true;
     renderClicker();
   }
+  const reportClicker = () => { if (audience) chan?.postMessage({ type: 'clicker' }); else seeClicker(); };
+  const hidKey = d => `${d.vendorId}:${d.productId}`;
+  async function loadHID() {
+    if (!navigator.hid || audience) return;
+    const saved = localStorage.getItem('cqts-clicker-hid');
+    const known = await navigator.hid.getDevices().catch(() => []);
+    hidDev = known.find(d => hidKey(d) === saved) || null;
+    renderClicker();
+    navigator.hid.addEventListener('connect', e => {
+      if (hidKey(e.device) !== localStorage.getItem('cqts-clicker-hid')) return;
+      hidDev = e.device; clickerFresh = true; flash(`${clickerName()} connected`); renderClicker();
+    });
+    navigator.hid.addEventListener('disconnect', e => {
+      if (!hidDev || hidKey(e.device) !== hidKey(hidDev)) return;
+      const n = clickerName(); hidDev = null; clickerAt = 0; flash(`${n} disconnected`); renderClicker();
+    });
+  }
+  async function detectClicker() {
+    if (navigator.hid) {
+      startNote = 'Choose your clicker in the list. If it is not there, press Cancel.'; renderStart();
+      try {
+        const [d] = await navigator.hid.requestDevice({ filters: [] });
+        startNote = ''; renderStart();
+        if (d) { hidDev = d; localStorage.setItem('cqts-clicker-hid', hidKey(d)); clickerFresh = true; flash(`${clickerName()} connected`); return renderClicker(); }
+      } catch { startNote = ''; renderStart(); }
+    }
+    pairing = true; renderClicker();
+    clearTimeout(pairT); pairT = setTimeout(() => { pairing = false; renderClicker(); }, 15000);
+  }
+
   function seeDevice(id, name, action) {
     const known = devices.has(id);
     if (!known && devices.size >= 8) return;
@@ -1349,10 +1408,29 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     if (![...devices.keys()].some(k => k !== 'watch')) remoteSeen = false;
     renderDevices();
   }
+  // Clickers that send arrow keys look like a keyboard, except that their presses last a few milliseconds.
+  const SHARED_KEYS = ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', ' ', 'Enter', 'Tab', 'Backspace'];
+  const BRIEF_MS = 40;
+  const learned = new Set(JSON.parse(localStorage.getItem('cqts-clicker-keys') || '[]'));
+  const pressedAt = {};
   function noteClicker(e) {
-    if (e.repeat || !CLICKER_ONLY.includes(e.key)) return;
-    if (audience) chan?.postMessage({ type: 'clicker' }); else seeClicker();
+    if (e.repeat) return false;
+    const k = e.key;
+    if (pairing && (SHARED_KEYS.includes(k) || CLICKER_ONLY.includes(k) || k === '.' || k === 'b')) {
+      pairing = false; clearTimeout(pairT);
+      learned.add(k); localStorage.setItem('cqts-clicker-keys', JSON.stringify([...learned]));
+      seeClicker();
+      e.preventDefault(); e.stopImmediatePropagation();     // a test press does not change slide
+      return true;
+    }
+    pressedAt[k] = performance.now();
+    if (CLICKER_ONLY.includes(k) || learned.has(k)) reportClicker();
+    return false;
   }
+  addEventListener('keyup', e => {
+    const t = pressedAt[e.key]; delete pressedAt[e.key];
+    if (t !== undefined && SHARED_KEYS.includes(e.key) && performance.now() - t <= BRIEF_MS) reportClicker();
+  }, true);
   setInterval(renderDevices, 5000);
 
   let flashT;
@@ -1382,6 +1460,10 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     connectRemote(); drawQR(); renderDevices();
   }
   $('rowremote').onclick = openRemote;
+  $('clkfind').onclick = detectClicker;
+  $('pdevs').onclick = openRemote;
+  $('pclk').onclick = () => openStart();
+  loadHID();
   $('rclose').onclick = () => body.classList.remove('show-remote');
   $('remote').addEventListener('click', e => { if (e.target === $('remote')) body.classList.remove('show-remote'); });
   $('roff').onclick = () => { relay?.close(); relay = null; remoteSeen = false; devices.clear(); renderDevices(); localStorage.removeItem('cqts-remote-on'); body.classList.remove('show-remote'); };
