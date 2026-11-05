@@ -24,7 +24,11 @@ header{display:flex;align-items:center;gap:8px;font-size:13px;min-height:22px}
 #count{font-variant-numeric:tabular-nums;color:var(--ink2)}
 #count i{font-style:normal;color:var(--ink3)}
 main{flex:1;min-height:0;display:flex;flex-direction:column;gap:14px}
-#thumb{width:100%;aspect-ratio:16/9;flex:none;border-radius:10px;background:#fff center/cover no-repeat}
+#thumb{position:relative;width:100%;aspect-ratio:16/9;flex:none;border-radius:10px;background:#fff center/cover no-repeat;touch-action:none;overflow:hidden}
+#ldot{position:absolute;left:-12px;top:-12px;width:24px;height:24px;border-radius:50%;background:radial-gradient(circle,#fff 0,#ff3b30 26%,rgba(255,59,48,.7) 42%,rgba(255,59,48,0) 72%);opacity:0;pointer-events:none}
+#ldot.on{opacity:1}
+#lhint{flex:none;margin-top:-8px;font-size:12px;color:var(--ink3);text-align:center}
+#lhint:empty{display:none}
 #notes{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;font-size:17px;line-height:1.42;letter-spacing:-.01em;color:var(--ink);-webkit-user-select:text;user-select:text}
 #notes h1{display:none}
 nav{display:grid;grid-template-columns:1fr 2.2fr;gap:8px;flex:none}
@@ -62,6 +66,7 @@ button:disabled{opacity:.3}
   header{grid-column:1/-1}
   main{display:contents}
   #thumb{grid-column:1;grid-row:2;align-self:start;max-height:100%}
+  #lhint{display:none}
   #notes{grid-column:2;grid-row:2/5}
   nav{grid-column:1;grid-row:3}
   #tools{grid-column:1;grid-row:4}
@@ -72,7 +77,8 @@ button:disabled{opacity:.3}
 <body>
 <header><span id="dot"></span><span id="status">Connecting…</span><span id="count"></span></header>
 <main>
-  <div id="thumb" role="img" aria-label="Current slide"></div>
+  <div id="thumb" role="img" aria-label="Current slide. Drag to point with the laser"><i id="ldot"></i></div>
+  <div id="lhint">Drag on the slide to point</div>
   <div id="notes"></div>
 </main>
 <nav>
@@ -102,6 +108,7 @@ button:disabled{opacity:.3}
   <p>Each tap takes a second or two. “New code” on the computer means setting these up again.</p>
 </div>
 
+<script src="assets/laser-link.js"></script>
 <script>
 (() => {
   const $ = id => document.getElementById(id);
@@ -188,6 +195,45 @@ button:disabled{opacity:.3}
   setInterval(() => { if (!document.hidden && live) send('ping'); }, 90000);
   addEventListener('pagehide', () => { navigator.sendBeacon?.(`${RELAY}${room}?cache=no`, `bye~${me}`); });
 
+  // laser: the finger on the slide preview is the dot on the slide
+  const pad = $('thumb'), ldot = $('ldot');
+  let sender = null, linkUp = false, aim = null, sendT = 0, lastSent = 0;
+  const openLink = () => {
+    if (sender) return;
+    sender = window.laserSend?.(`${room}/laser`, up => {
+      linkUp = up;
+      if (!localStorage.getItem('cqts-laser-used') || !up) $('lhint').textContent = up ? 'Drag on the slide to point' : 'Laser unavailable on this network';
+    }) || null;
+  };
+  function aimAt(e) {
+    const r = pad.getBoundingClientRect();
+    const x = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)), y = Math.max(0, Math.min(1, (e.clientY - r.top) / r.height));
+    aim = `${x.toFixed(3)},${y.toFixed(3)}`;
+    ldot.style.transform = `translate(${x * r.width}px,${y * r.height}px)`;
+  }
+  // 12 updates a second is what the free relay carries without dropping any
+  const pump = () => {
+    if (aim === null) return;
+    sender?.send(aim); sendT = setTimeout(pump, 80);
+  };
+  pad.addEventListener('pointerdown', e => {
+    openLink();
+    try { pad.setPointerCapture(e.pointerId); } catch {}
+    aimAt(e); ldot.classList.add('on');
+    navigator.vibrate?.(8);
+    localStorage.setItem('cqts-laser-used', '1');
+    if (linkUp) $('lhint').textContent = '';
+    clearTimeout(sendT); pump();
+  });
+  pad.addEventListener('pointermove', e => { if (aim !== null) aimAt(e); });
+  const lift = () => {
+    if (aim === null) return;
+    aim = null; clearTimeout(sendT); ldot.classList.remove('on');
+    sender?.send('off');
+  };
+  pad.addEventListener('pointerup', lift);
+  pad.addEventListener('pointercancel', lift);
+
   // keep the screen awake while presenting
   let lock;
   const stayAwake = async () => { try { lock = await navigator.wakeLock?.request('screen'); } catch {} };
@@ -208,6 +254,8 @@ button:disabled{opacity:.3}
   // Apple Watch setup
   const url = m => `${RELAY}${room}/publish?message=${m}&cache=no`;
   $('unext').textContent = url('next'); $('uprev').textContent = url('prev');
+  if (localStorage.getItem('cqts-laser-used')) $('lhint').textContent = '';
+  openLink();
   $('watch').onclick = () => $('sheet').classList.add('on');
   $('close').onclick = () => $('sheet').classList.remove('on');
   const copy = (btn, text) => { btn.onclick = async () => { try { await navigator.clipboard.writeText(text); btn.textContent = 'Copied'; } catch { btn.textContent = 'Select to copy'; } }; };

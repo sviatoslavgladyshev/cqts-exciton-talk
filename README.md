@@ -43,10 +43,10 @@ Chrome or Edge, and press **P** or choose *Presenter* in the toolbar. The first 
 
 Safari and Firefox cannot move windows between displays: choose Presenter, drag the slides window onto the projector, then click it and press **F**.
 
-**Phone, tablet or Apple Watch:** press **R** and scan the QR code. Connected remotes appear in that sheet, in Settings and at the top of the presenter screen. The phone gets Next, Back, Black screen, the current slide and your notes,
+**Phone, tablet or Apple Watch:** press **R** and scan the QR code. Connected remotes appear in that sheet, in Settings and at the top of the presenter screen. The phone gets Next, Back, Black screen, a laser pointer (drag on the slide preview), the current slide and your notes,
 on Wi-Fi or mobile data with no app. The Apple Watch uses two iPhone Shortcuts; the steps and addresses are under *Apple Watch* on the phone page.
 The site is static, so commands pass through the public relay [ntfy.sh](https://ntfy.sh) on a private random channel. The remote stays off until you open it,
-and only commands such as `next` are sent. Keep the QR code private, since anyone with it can change slides; *New code* cancels the old one.
+and only commands such as `next` are sent. The laser needs faster updates, so it uses a public MQTT broker (HiveMQ, with EMQX as backup) and sends only the pointer position. Keep the QR code private, since anyone with it can change slides; *New code* cancels the old one.
 The relay allows 250 messages a day per network, so keep a keyboard or clicker as a backup.
 
 **Clicker:** presentation remotes work with no setup. The clicker has its own indicator on the presenter screen, separate from remotes, which turns to *Clicker detected* at the first press of a clicker-style key (PageDown, PageUp, F5 or a media key). Clickers that send arrow keys are recognised by their very brief presses. If yours is not, use *Detect* in Settings: pick it from Chrome's USB list, or press forward on it when asked. Forward and back send PageDown and PageUp (or media-track keys),

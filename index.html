@@ -199,6 +199,11 @@ kbd{display:inline-block;min-width:22px;padding:2px 6px;margin-left:3px;border-r
 #black{position:fixed;inset:0;background:#000;z-index:15;opacity:0;pointer-events:none;transition:opacity .4s ease}
 body.black #black{opacity:1;pointer-events:auto}
 
+/* laser pointer, placed in slide coordinates */
+#laser{position:absolute;left:-17px;top:-17px;width:34px;height:34px;border-radius:50%;z-index:50;pointer-events:none;opacity:0;transition:opacity .14s;will-change:transform;
+  background:radial-gradient(circle,#fff 0,#ff3b30 26%,rgba(255,59,48,.7) 42%,rgba(255,59,48,0) 72%)}
+#laser.on{opacity:1}
+
 /* the slides window */
 body.audience,body.audience #stage{cursor:none;background:#000}
 body.audience #bar,body.audience #notes,body.audience #jump,body.audience #peek{display:none}
@@ -267,7 +272,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
 @page{size:1920px 1080px;margin:0}
 @media print{
   html,body{overflow:visible;background:#fff}
-  #bar,#notes,#grid,#phead,#pv,#pnotes,#help,#jump,#black,#peek,#start,#seg,#remote{display:none!important}
+  #bar,#notes,#grid,#phead,#pv,#pnotes,#help,#jump,#black,#peek,#start,#seg,#remote,#laser{display:none!important}
   #stage{position:static}
   #deck{position:static;transform:none!important;box-shadow:none;width:auto;height:auto;overflow:visible;border-radius:0;opacity:1}
   .slide{position:relative;visibility:visible;opacity:1!important;transform:none!important;page-break-after:always;break-after:page}
@@ -1293,6 +1298,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     relay = new EventSource(`${RELAY}${room}/sse`);
     relay.onopen = () => { remoteStatus('Ready. Waiting for your phone or tablet.'); say('hi'); };   // open remotes answer with hello
     relay.onerror = () => remoteStatus('Reconnecting to the relay…');
+    connectLaser();
     relay.onmessage = e => {
       let d; try { d = JSON.parse(e.data); } catch { return; }
       if (d.event !== 'message' || heard.has(d.id)) return;
@@ -1449,6 +1455,35 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   }, true);
   setInterval(renderDevices, 5000);
 
+  // ---------- laser pointer, drawn from the phone ----------
+  const dotEl = document.createElement('div'); dotEl.id = 'laser'; deck.append(dotEl);
+  let laser = null, dotX = 0, dotY = 0, aimX = 0, aimY = 0, dotShown = false, dotLoop = 0, dotT;
+  function dotFrame() {
+    dotX += (aimX - dotX) * .3; dotY += (aimY - dotY) * .3;
+    dotEl.style.transform = `translate(${dotX * 1920}px,${dotY * 1080}px)`;
+    dotLoop = dotShown ? requestAnimationFrame(dotFrame) : 0;
+  }
+  function showLaser(s) {
+    clearTimeout(dotT);
+    const off = () => { dotShown = false; dotEl.classList.remove('on'); };
+    if (s === 'off') return off();
+    const [x, y] = String(s).split(',').map(Number);
+    if (!(x >= 0 && x <= 1 && y >= 0 && y <= 1)) return;
+    if (!dotShown) { dotX = x; dotY = y; }
+    aimX = x; aimY = y; dotShown = true;
+    dotEl.classList.add('on');
+    dotT = setTimeout(off, 1600);          // in case the final message is lost
+    if (!dotLoop) dotLoop = requestAnimationFrame(dotFrame);
+  }
+  const onLaser = s => { showLaser(s); chan?.postMessage({ type: 'laser', s }); };
+  function connectLaser() {
+    if (laser || audience) return;
+    const start = () => { if (relay && !laser) laser = window.laserListen(`${room}/laser`, onLaser); };
+    if (window.laserListen) return start();
+    const s = document.createElement('script'); s.src = 'assets/laser-link.js'; s.onload = start; document.head.append(s);
+  }
+  const stopLaser = () => { laser?.close(); laser = null; };
+
   let flashT;
   function flash(text) {
     $('jump').textContent = text; $('jump').classList.add('on');
@@ -1482,9 +1517,9 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   loadHID();
   $('rclose').onclick = () => body.classList.remove('show-remote');
   $('remote').addEventListener('click', e => { if (e.target === $('remote')) body.classList.remove('show-remote'); });
-  $('roff').onclick = () => { relay?.close(); relay = null; remoteSeen = false; devices.clear(); renderDevices(); localStorage.removeItem('cqts-remote-on'); body.classList.remove('show-remote'); };
+  $('roff').onclick = () => { stopLaser(); relay?.close(); relay = null; remoteSeen = false; devices.clear(); renderDevices(); localStorage.removeItem('cqts-remote-on'); body.classList.remove('show-remote'); };
   $('rnew').onclick = () => {
-    relay?.close(); relay = null; remoteSeen = false;
+    stopLaser(); relay?.close(); relay = null; remoteSeen = false;
     devices.clear(); renderDevices();
     room = newRoom(); localStorage.setItem('cqts-room', room);
     connectRemote(); drawQR();
@@ -1574,6 +1609,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     if (e.data?.type === 'black') setBlack(e.data.on, true);
     if (e.data?.type === 'end' && audience && e.data.keep !== slidesId) window.close();
     if (e.data?.type === 'clicker' && !audience) seeClicker();
+    if (e.data?.type === 'laser') showLaser(e.data.s);
     if (e.data?.type === 'who' && audience) reportSlides?.();
     if (e.data?.type === 'slides-gone' && !audience && e.data.id === currentSlides) { slidesAlive = false; slidesFull = false; updateBanner(); }
     if (e.data?.type === 'slides' && !audience) {
