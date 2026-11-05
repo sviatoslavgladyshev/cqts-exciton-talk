@@ -18,6 +18,19 @@ body{display:flex;flex-direction:column;gap:12px;padding:calc(10px + env(safe-ar
 header{display:flex;align-items:center;gap:10px;font-size:14px;min-height:30px}
 #dot{width:9px;height:9px;border-radius:50%;background:#ff9f0a;flex:none;transition:background .3s}
 #dot.ok{background:#30d158}#dot.bad{background:#ff453a}
+#dot.sent{animation:sent .5s ease}
+@keyframes sent{0%{transform:scale(1)}40%{transform:scale(2);box-shadow:0 0 12px #30d158}100%{transform:scale(1)}}
+#joined{position:fixed;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:rgba(8,8,11,.92);opacity:0;pointer-events:none}
+#joined svg{width:112px;height:112px;margin-bottom:10px;fill:#30d158}
+#joined path{fill:none;stroke:#fff;stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:40;stroke-dashoffset:40}
+#joined b{font-size:26px;letter-spacing:-.02em}
+#joined span{color:var(--ink2);font-size:15px}
+#joined.on{animation:jfade 1.9s ease both}
+#joined.on svg{animation:jpop .55s cubic-bezier(.34,1.56,.64,1) both}
+#joined.on path{animation:jdraw .4s .22s ease forwards}
+@keyframes jfade{0%{opacity:0}8%,75%{opacity:1}100%{opacity:0}}
+@keyframes jpop{from{transform:scale(.4)}to{transform:none}}
+@keyframes jdraw{to{stroke-dashoffset:0}}
 #status{flex:1;min-width:0;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #count{font-weight:600;font-variant-numeric:tabular-nums}
 #count i{font-style:normal;color:var(--ink3);font-weight:400}
@@ -71,6 +84,8 @@ button:disabled{opacity:.35}
   <button id="watch">Apple Watch</button>
 </div>
 
+<div id="joined"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24"/><path d="m15 27 8 8 15-17"/></svg><b>Connected</b><span>You're in control</span></div>
+
 <div id="sheet" role="dialog" aria-label="Apple Watch setup">
   <h2>Apple Watch</h2>
   <p>A watch can't scan this page, so it uses two small Shortcuts on your iPhone. You only set this up once.</p>
@@ -93,6 +108,9 @@ button:disabled{opacity:.35}
   const room = location.hash.slice(1);
   const RELAY = 'https://ntfy.sh/';
   const me = Math.random().toString(36).slice(2, 7);
+  const ua = navigator.userAgent;
+  const myName = /iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1) ? 'iPad'
+    : /iPhone/.test(ua) ? 'iPhone' : /Android/.test(ua) ? (/Mobile/.test(ua) ? 'Android phone' : 'Android tablet') : 'Browser remote';
   let slides = [], n = 0, black = false, live = false, seen = new Set(), wait;
 
   const status = (text, cls = '') => { $('status').textContent = text; $('dot').className = cls; };
@@ -129,7 +147,7 @@ button:disabled{opacity:.35}
   $('black').onclick = () => press('black', () => { black = !black; });
 
   function hello() {
-    send('hello');
+    fetch(`${RELAY}${room}?cache=no`, { method: 'POST', body: `hello~${me}~${myName}` }).catch(() => status('No connection', 'bad'));
     clearTimeout(wait);
     wait = setTimeout(() => { if (!live) status('Open the talk on your computer', 'bad'); }, 7000);
   }
@@ -143,10 +161,16 @@ button:disabled{opacity:.35}
       seen.add(d.id);
       const [cmd, from] = String(d.message).split('~');
       if (cmd.startsWith('at:')) {
-        const [, i, b] = cmd.split(':');
-        n = clamp(+i); black = b === '1'; live = true;
-        status('Connected', 'ok'); show();
-      } else if (from !== me) {
+        const [, i, b, mode] = cmd.split(':');
+        n = clamp(+i); black = b === '1';
+        if (!live) celebrate();
+        live = true;
+        status(`Connected · ${mode === 'p' ? 'Presenter mode' : 'Viewer'}`, 'ok'); show();
+      } else if (cmd === 'hi') {
+        hello();                                          // the computer just came back
+      } else if (from === me) {
+        $('dot').classList.remove('sent'); $('dot').offsetWidth; $('dot').classList.add('sent');   // the relay has the tap
+      } else {
         if (cmd === 'next') n = clamp(n + 1);
         else if (cmd === 'prev') n = clamp(n - 1);
         else if (cmd === 'first') n = 0;
@@ -155,6 +179,14 @@ button:disabled{opacity:.35}
       }
     };
   }
+
+  function celebrate() {
+    navigator.vibrate?.([15, 40, 15]);
+    $('joined').classList.remove('on'); $('joined').offsetWidth; $('joined').classList.add('on');
+  }
+  // tells the computer this page is still here, and that it has left
+  setInterval(() => { if (!document.hidden && live) send('ping'); }, 90000);
+  addEventListener('pagehide', () => { navigator.sendBeacon?.(`${RELAY}${room}?cache=no`, `bye~${me}`); });
 
   // keep the screen awake while presenting
   let lock;

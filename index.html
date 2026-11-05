@@ -135,6 +135,34 @@ kbd{display:inline-block;min-width:24px;padding:3px 7px;margin-left:3px;border-r
 #black{position:fixed;inset:0;background:#000;z-index:15;opacity:0;pointer-events:none;transition:opacity .4s ease}
 body.black #black{opacity:1;pointer-events:auto}
 
+/* connected devices */
+.dev{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:rgba(48,209,88,.15);color:var(--ink);font-size:12.5px;font-weight:500;white-space:nowrap}
+.dev i{width:7px;height:7px;border-radius:50%;background:#30d158;box-shadow:0 0 6px rgba(48,209,88,.8)}
+.dev.off{background:rgba(255,255,255,.08);color:var(--ink-2)}
+.dev.off i{background:var(--ink-3);box-shadow:none}
+.dev.ping{animation:devping .7s var(--ease)}
+@keyframes devping{0%{transform:scale(1);background:rgba(48,209,88,.6)}35%{transform:scale(1.09)}100%{transform:scale(1)}}
+#pdevs,#bdevs{display:flex;gap:6px;flex:none;align-items:center}
+#bdevs{margin-left:8px;max-width:230px;overflow:hidden}
+#rdevs{display:flex;flex-direction:column;gap:7px;margin:0 0 12px}
+#rdevs:empty{display:none}
+.drow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.drow small{font-size:12.5px;color:var(--ink-2)}
+#rqrwrap{position:relative}
+#rok{position:absolute;inset:0;display:grid;place-items:center;border-radius:18px;background:rgba(255,255,255,.93);opacity:0;pointer-events:none}
+#rok svg{width:96px;height:96px;fill:#30d158;stroke:none}
+#rok path{fill:none;stroke:#fff;stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:40;stroke-dashoffset:40}
+#rok.on{animation:rokfade 2.4s ease both}
+#rok.on svg{animation:rokpop .55s cubic-bezier(.34,1.56,.64,1) both}
+#rok.on path{animation:rokdraw .4s .22s ease forwards}
+@keyframes rokfade{0%{opacity:0}8%,78%{opacity:1}100%{opacity:0}}
+@keyframes rokpop{from{transform:scale(.4)}to{transform:none}}
+@keyframes rokdraw{to{stroke-dashoffset:0}}
+#clkrow{display:flex;align-items:center;gap:10px;margin-top:10px;padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.06);font-size:13.5px;color:var(--ink-2)}
+#clkrow i{width:8px;height:8px;border-radius:50%;background:var(--ink-3)}
+#clkrow.ok{color:var(--ink)}
+#clkrow.ok i{background:#30d158;box-shadow:0 0 6px rgba(48,209,88,.8)}
+
 /* phone remote */
 #remote{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:16px;background:rgba(0,0,0,.5);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);opacity:0;visibility:hidden;transition:opacity .24s,visibility 0s linear .24s}
 body.show-remote #remote{opacity:1;visibility:visible;transition:opacity .24s,visibility 0s}
@@ -144,6 +172,7 @@ body.show-remote #remote{opacity:1;visibility:visible;transition:opacity .24s,vi
 #remotecard h2{margin:0 0 8px;font-size:24px;font-weight:700;letter-spacing:-.02em}
 #remotecard p{margin:0 0 10px;font-size:14px;line-height:1.45;color:var(--ink-2)}
 #rstatus{color:var(--ink)!important;font-weight:500}
+#rstatus[hidden]{display:none}
 #rlink{color:var(--tint)}
 #rbtns{display:flex;gap:8px;margin-top:6px}
 #rbtns button{all:unset;cursor:pointer;padding:8px 14px;border-radius:10px;font-size:13px;font-weight:500;color:var(--ink);background:rgba(255,255,255,.1)}
@@ -198,6 +227,7 @@ body.presenter #stage{right:40%;top:84px;bottom:112px}
 body.presenter #bar{left:30%;width:min(calc(60vw - 32px),640px);bottom:16px}
 body.presenter #bnotes,body.presenter #notes{display:none}
 body.presenter #chapter{visibility:hidden}
+body.presenter #bdevs{display:none}
 body.presenter #phead{display:flex;position:fixed;left:0;right:0;top:0;height:76px;align-items:center;gap:34px;padding:0 28px;color:var(--ink);box-shadow:inset 0 -1px 0 rgba(255,255,255,.08)}
 #phead .lab,#pv .lab{font-size:12px;font-weight:500;color:var(--ink-3);margin-bottom:2px}
 #timer,#clock{font-size:30px;font-weight:600;letter-spacing:-.015em;font-variant-numeric:tabular-nums;line-height:1.1}
@@ -214,12 +244,12 @@ body.presenter #pv{display:block;position:fixed;right:0;top:84px;width:40%;paddi
 #nextwrap .slide{visibility:visible;opacity:1;transition:none;transform-origin:0 0;pointer-events:none}
 #nextwrap{background:#fff}
 #nextwrap.end{background:rgba(255,255,255,.05)}
-#rehearse{min-width:0;flex:1;font-size:13px;line-height:1.35;color:var(--ink-2)}
+#rehearse{min-width:120px;flex:1;font-size:13px;line-height:1.35;color:var(--ink-2)}
 body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;top:calc(84px + 12px + 22px + (40vw - 36px) * .5625 + 18px);overflow:auto;padding:4px 28px 24px 8px;font-size:var(--notes,22px);line-height:1.5;letter-spacing:-.005em;color:var(--ink)}
 
 /* ---------- small screens ---------- */
 @media (max-width:720px){
-  #chapter,.sep,#seg,#bar #bpres,#bar #bhelp,#bar #bremote{display:none}
+  #chapter,.sep,#seg,#bdevs,#bar #bpres,#bar #bhelp,#bar #bremote{display:none}
   #remotecard{grid-template-columns:1fr}
   #row{justify-content:space-between}
   #count{flex:1}
@@ -736,6 +766,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
 <header id="phead">
   <div><div class="lab">Elapsed</div><div id="timer">00:00</div></div>
   <div><div class="lab">Time</div><div id="clock">--:--</div></div>
+  <div id="pdevs"></div>
   <div id="rehearse"></div>
   <div id="ptools">
     <button id="pfs" hidden>Make slides full screen</button>
@@ -764,17 +795,19 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
       <button id="mslides"><svg viewBox="0 0 30 30"><rect x="3.500" y="6" width="23" height="15" rx="2.500"/><path d="m12.500 10 6 3.500-6 3.500z"/><path d="M11 25h8"/></svg><b>Slides only</b><span id="mslidesd"></span></button>
     </div>
     <div id="setrow"><div><b>Full screen on the slides display</b><span>Slides fill the display at your first click, key or clicker press.</span></div><button id="sfull" role="switch" aria-checked="true" aria-label="Full screen on the slides display"></button></div>
+    <div id="clkrow"><i></i><span id="clkstate"></span></div>
     <div id="startfoot"><button id="mskip">Just browse the slides</button><button id="mreset">Reset displays</button></div>
   </div>
 </div>
 
 <div id="remote" role="dialog" aria-label="Phone remote">
   <div id="remotecard" class="glass">
-    <div id="rqr"></div>
+    <div id="rqrwrap"><div id="rqr"></div><div id="rok"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24"/><path d="m15 27 8 8 15-17"/></svg></div></div>
     <div>
-      <h2>Phone or tablet remote</h2>
-      <p>Scan with your camera. It works on Wi-Fi or mobile data, with no app to install.</p>
+      <h2 id="rtitle">Phone or tablet remote</h2>
+      <p id="rhint"></p>
       <p id="rstatus">Connecting…</p>
+      <div id="rdevs"></div>
       <p>Apple Watch setup is on the phone page. <a id="rlink" target="_blank" rel="noopener">Open remote here</a></p>
       <div id="rbtns"><button id="rclose">Done</button><button id="rnew">New code</button><button id="roff">Turn off</button></div>
     </div>
@@ -810,6 +843,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     <button id="bprev" aria-label="Previous slide" data-tip="Previous  ←"><svg viewBox="0 0 24 24"><path d="M14.5 5.5 8 12l6.5 6.5"/></svg></button>
     <span id="count"></span>
     <button id="bnext" aria-label="Next slide" data-tip="Next  →"><svg viewBox="0 0 24 24"><path d="M9.5 5.5 16 12l-6.5 6.5"/></svg></button>
+    <div id="bdevs"></div>
     <div id="chapter"></div>
     <div id="seg" role="group" aria-label="Mode">
       <button data-m="viewer" data-tip="Switch mode  P">Viewer</button>
@@ -836,7 +870,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   let isPresenter = false;
   const chan = 'BroadcastChannel' in window ? new BroadcastChannel('cqts-deck') : null;
   const body = document.body;
-  let cur = -1;
+  let cur = -1, atTimer;
 
   // check-circle icon used on result cards
   document.querySelectorAll('x-icon').forEach(el => {
@@ -1190,6 +1224,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   $('pfs').onclick = fullscreenSlides;
   // With the setting on, the first key or clicker press fills the display and does not also change slide.
   addEventListener('keydown', e => {
+    noteClicker(e);
     if (!autoFull || e.key === 'Escape' || !pw || pw.closed || !slidesOn || slidesFull) return;
     fullscreenSlides();
     if (!firstPressUsed && NEXT_KEYS.includes(e.key)) { firstPressUsed = true; e.preventDefault(); e.stopImmediatePropagation(); }
@@ -1235,33 +1270,95 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   // The site is static, so phone and computer talk through a public relay, on a private random channel.
   // It connects only after the remote is switched on here, and carries only commands such as "next".
   const RELAY = 'https://ntfy.sh/';
-  let room = localStorage.getItem('cqts-room'), relay = null, remoteSeen = false, atTimer;
+  let room = localStorage.getItem('cqts-room'), relay = null, remoteSeen = false;
   const heard = new Set();
   const newRoom = () => 'cqts-' + [...crypto.getRandomValues(new Uint8Array(16))].map(b => b.toString(16).padStart(2, '0')).join('');
   const say = m => fetch(`${RELAY}${room}?cache=no`, { method: 'POST', body: m }).catch(() => {});
-  const sayWhere = () => say(`at:${cur}:${body.classList.contains('black') ? 1 : 0}`);
+  const sayWhere = () => say(`at:${cur}:${body.classList.contains('black') ? 1 : 0}:${isPresenter ? 'p' : 'v'}`);
   const remoteStatus = t => { $('rstatus').textContent = t; };
   function connectRemote() {
     if (relay || audience) return;
     relay = new EventSource(`${RELAY}${room}/sse`);
-    relay.onopen = () => { remoteStatus(remoteSeen ? 'Remote connected.' : 'Ready. Waiting for your phone or tablet.'); say('hi'); };
+    relay.onopen = () => { remoteStatus('Ready. Waiting for your phone or tablet.'); say('hi'); };   // open remotes answer with hello
     relay.onerror = () => remoteStatus('Reconnecting to the relay…');
     relay.onmessage = e => {
       let d; try { d = JSON.parse(e.data); } catch { return; }
       if (d.event !== 'message' || heard.has(d.id)) return;
       heard.add(d.id);
-      const cmd = String(d.message).split('~')[0];
+      const [cmd, from, name] = String(d.message).split('~');
+      if (!['next', 'prev', 'first', 'black', 'hello', 'ping', 'bye'].includes(cmd)) return;
+      const id = from || 'watch';      // the watch Shortcuts send a bare command
+      if (cmd === 'bye') return dropDevice(id);
       if (cmd === 'next') go(cur + 1, { fromRemote: true });
       else if (cmd === 'prev') go(cur - 1, { fromRemote: true });
       else if (cmd === 'first') go(0, { fromRemote: true });
       else if (cmd === 'black') setBlack(!body.classList.contains('black'));
-      else if (cmd === 'hello') {
-        if (!remoteSeen) { remoteSeen = true; flash('Remote connected'); }
-        remoteStatus('Remote connected.');
-        sayWhere();
-      }
+      else if (cmd === 'hello') { remoteSeen = true; sayWhere(); }
+      seeDevice(id, name || (id === 'watch' ? 'Apple Watch' : ''), CMD_NAMES[cmd]);
     };
   }
+  // connected devices, shown in the remote sheet, the toolbar and the presenter header
+  const devices = new Map();
+  const CMD_NAMES = { next: 'Next', prev: 'Back', first: 'First slide', black: 'Black screen' };
+  const QUIET = 200000;       // a phone pings every 90 s while its page is open
+  const CLICKER_ONLY = ['PageDown', 'PageUp', 'F5', 'MediaTrackNext', 'MediaTrackPrevious'];
+  const ago = t => { const s = Math.round((Date.now() - t) / 1000); return s < 3 ? 'just now' : s < 60 ? `${s}s ago` : `${Math.floor(s / 60)}m ago`; };
+  const isQuiet = (id, d) => id.length > 0 && id !== 'clicker' && id !== 'watch' && Date.now() - d.seen > QUIET;
+  function chip(id, d) {
+    const c = document.createElement('span');
+    c.className = 'dev' + (isQuiet(id, d) ? ' off' : '') + (d.fresh ? ' ping' : '');
+    c.append(document.createElement('i'), d.name);
+    return c;
+  }
+  function renderDevices() {
+    const list = [...devices];
+    $('pdevs').replaceChildren(...list.map(([id, d]) => chip(id, d)));
+    $('bdevs').replaceChildren(...list.map(([id, d]) => chip(id, d)));
+    $('rdevs').replaceChildren(...list.map(([id, d]) => {
+      const row = document.createElement('div'); row.className = 'drow';
+      const what = document.createElement('small');
+      what.textContent = isQuiet(id, d) ? 'Not responding' : d.action ? `${d.action} · ${ago(d.seen)}` : 'Connected';
+      row.append(chip(id, d), what);
+      return row;
+    }));
+    const phones = list.filter(([id]) => id !== 'clicker' && id !== 'watch');
+    if (body.classList.contains('show-remote')) $('rtitle').textContent = phones.length ? `${phones[0][1].name} connected` : 'Phone or tablet remote';
+    $('rstatus').hidden = phones.length > 0;
+    $('rhint').textContent = phones.length ? 'Press Next on it to try. Scan again to add another device.' : 'Scan with your camera. It works on Wi-Fi or mobile data, with no app to install.';
+    const clk = devices.get('clicker');
+    $('clkstate').textContent = clk ? `Clicker detected · last press ${ago(clk.seen)}` : 'Press a button on your clicker to test it.';
+    $('clkrow').classList.toggle('ok', !!clk);
+    list.forEach(([, d]) => { d.fresh = false; });
+  }
+  function seeDevice(id, name, action) {
+    const known = devices.has(id);
+    if (!known && devices.size >= 8) return;
+    const d = devices.get(id) || {};
+    Object.assign(d, { name: String(name || d.name || 'Remote').slice(0, 24), seen: Date.now(), fresh: !!action || !known });
+    if (action) d.action = action;
+    devices.set(id, d);
+    if (!known) {
+      flash(id === 'clicker' ? 'Clicker detected' : `${d.name} connected`);
+      if (id !== 'clicker' && body.classList.contains('show-remote')) {
+        $('rok').classList.remove('on'); $('rok').offsetWidth; $('rok').classList.add('on');
+      }
+    }
+    renderDevices();
+  }
+  function dropDevice(id) {
+    const d = devices.get(id);
+    if (!d) return;
+    devices.delete(id);
+    flash(`${d.name} disconnected`);
+    if (![...devices.keys()].some(k => k !== 'clicker' && k !== 'watch')) remoteSeen = false;
+    renderDevices();
+  }
+  function noteClicker(e) {
+    if (e.repeat || !CLICKER_ONLY.includes(e.key)) return;
+    if (audience) chan?.postMessage({ type: 'clicker' }); else seeDevice('clicker', 'Clicker', 'Press');
+  }
+  setInterval(renderDevices, 5000);
+
   let flashT;
   function flash(text) {
     $('jump').textContent = text; $('jump').classList.add('on');
@@ -1286,15 +1383,16 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     if (!room) { room = newRoom(); localStorage.setItem('cqts-room', room); }
     localStorage.setItem('cqts-remote-on', '1');
     body.classList.add('show-remote');
-    connectRemote(); drawQR();
+    connectRemote(); drawQR(); renderDevices();
   }
   $('bremote').onclick = openRemote;
   $('premote').onclick = openRemote;
   $('rclose').onclick = () => body.classList.remove('show-remote');
   $('remote').addEventListener('click', e => { if (e.target === $('remote')) body.classList.remove('show-remote'); });
-  $('roff').onclick = () => { relay?.close(); relay = null; remoteSeen = false; localStorage.removeItem('cqts-remote-on'); body.classList.remove('show-remote'); };
+  $('roff').onclick = () => { relay?.close(); relay = null; remoteSeen = false; devices.forEach((d, id) => { if (id !== 'clicker') devices.delete(id); }); renderDevices(); localStorage.removeItem('cqts-remote-on'); body.classList.remove('show-remote'); };
   $('rnew').onclick = () => {
     relay?.close(); relay = null; remoteSeen = false;
+    devices.forEach((d, id) => { if (id !== 'clicker') devices.delete(id); }); renderDevices();
     room = newRoom(); localStorage.setItem('cqts-room', room);
     remoteStatus('New code ready. Scan it to connect.');
     connectRemote(); drawQR();
@@ -1384,6 +1482,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     if (e.data?.type === 'go') go(e.data.n, { remote: true });
     if (e.data?.type === 'black') setBlack(e.data.on, true);
     if (e.data?.type === 'end' && audience && e.data.keep !== slidesId) window.close();
+    if (e.data?.type === 'clicker' && !audience) seeDevice('clicker', 'Clicker', 'Press');
     if (e.data?.type === 'slides' && !audience) {
       slidesFull = e.data.full; updateBanner();
       if (!slidesFull && autoFull) fullscreenSlides();   // works while the click that opened the window still counts
@@ -1422,6 +1521,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
       b.classList.toggle('on', active); b.setAttribute('aria-pressed', active);
     });
     updateBanner();
+    if (remoteSeen) { clearTimeout(atTimer); atTimer = setTimeout(sayWhere, 400); }
     if (on) { startClock(); renderNext(); playBuilds(slides[cur]); }
     fit(); wake();
   }
@@ -1437,6 +1537,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   if (!audience && room && localStorage.getItem('cqts-remote-on')) connectRemote();
   setPresenter(false);
   fit();
+  renderDevices();
   if (firstVisit) openStart();
   const ready = () => body.classList.add('ready');
   (document.fonts?.ready || Promise.resolve()).then(ready); setTimeout(ready, 1200);
