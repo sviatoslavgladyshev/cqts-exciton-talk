@@ -1,0 +1,76 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="fonts/roboto.css"></head><body style="margin:0"><style>
+html,body{margin:0;height:100%;background:#fff;overflow:hidden;font-family:"Google Sans",Roboto,"Helvetica Neue",Arial,sans-serif;color:#202124}
+canvas{position:absolute;inset:0;width:100%;height:100%}
+#chips{position:absolute;left:24px;top:18px;display:flex;gap:10px}
+#chips div{font-size:22px;font-weight:500;padding:8px 18px;border-radius:999px;border:2px solid #DADCE0;color:#5F6368;transition:all .35s cubic-bezier(.34,1.56,.64,1);background:#fff}
+#chips div.on{background:#4E057E;border-color:#4E057E;color:#fff;transform:scale(1.06)}
+#chips div.done{border-color:#C9B3DD;color:#4E057E}
+#cap{position:absolute;left:28px;top:86px;width:900px;font-size:32px;font-weight:500;line-height:1.3;transition:opacity .3s}
+#cap small{display:block;font-size:24px;font-weight:400;color:#5F6368;margin-top:6px}
+#tag{position:absolute;font-size:22px;font-weight:600;color:#fff;background:#E37400;padding:6px 16px;border-radius:999px;opacity:0;transition:opacity .3s}
+</style>
+<canvas id="c"></canvas><div id="chips"></div><div id="cap"></div><div id="tag">Proposed</div>
+<script>
+const cv=document.getElementById('c'),g=cv.getContext('2d'),cap=document.getElementById('cap'),chips=document.getElementById('chips'),tag=document.getElementById('tag');
+let W,H,S,D=2;
+function rs(){D=Math.min(2,devicePixelRatio||1);W=cv.clientWidth;H=cv.clientHeight;cv.width=W*D;cv.height=H*D;g.setTransform(D,0,0,D,0,0);S=Math.min(W/23,H/15.5)}
+addEventListener('resize',rs);rs();
+const C30=Math.cos(Math.PI/6),S30=0.5,Z=2.3,R=6;
+function P(x,y,z){return [W*0.64+(x-y)*C30*S,H*0.57+(x+y)*S30*S*0.9-z*S]}
+const hex=[...Array(6)].map((_,k)=>[R*Math.cos(Math.PI/3*k+Math.PI/6),R*Math.sin(Math.PI/3*k+Math.PI/6)]);
+const a=1.7,s3=Math.sqrt(3),LAT=[];
+for(let i=-7;i<=7;i++)for(let j=-7;j<=7;j++){const x=i*a+j*a/2,y=j*a*s3/2;LAT.push([x,y],[x+a/2,y+a/(2*s3)])}
+function inHex(x,y){for(let k=0;k<6;k++){const p=hex[k],q=hex[(k+1)%6];if((q[0]-p[0])*(y-p[1])-(q[1]-p[1])*(x-p[0])<0.5)return false}return true}
+const BOND=[];for(let i=0;i<LAT.length;i++)for(let j=i+1;j<LAT.length;j++){const dx=LAT[i][0]-LAT[j][0],dy=LAT[i][1]-LAT[j][1],d=dx*dx+dy*dy;if(d>0.9&&d<1.02&&(inHex(...LAT[i])||inHex(...LAT[j])))BOND.push([LAT[i],LAT[j]])}
+function path(pts){g.beginPath();pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.closePath()}
+function plate(z,fill,line,dot,shift,al){g.save();g.globalAlpha=al;const pts=hex.map(h=>P(h[0]+shift,h[1],z));
+ g.shadowColor='rgba(60,64,67,0.18)';g.shadowBlur=30;g.shadowOffsetY=18;path(pts);g.fillStyle=fill;g.fill();g.shadowColor='transparent';
+ g.lineJoin='round';g.lineWidth=3;g.strokeStyle=line;path(pts);g.stroke();
+ g.save();path(pts);g.clip();g.lineCap='round';g.lineJoin='round';g.lineWidth=2;g.strokeStyle=dot;g.globalAlpha=al*0.35;g.beginPath();
+ for(const [p,q] of BOND){const u=P(p[0]+shift,p[1],z),v=P(q[0]+shift,q[1],z);g.moveTo(u[0],u[1]);g.lineTo(v[0],v[1])}g.stroke();
+ g.restore();g.restore()}
+function ball(x,y,z,col,plus,sc){if(sc<=0)return;const p=P(x,y,z),r=0.62*S*sc;g.save();g.shadowColor='rgba(60,64,67,0.3)';g.shadowBlur=14;g.shadowOffsetY=6;
+ g.fillStyle=col;g.beginPath();g.arc(p[0],p[1],r,0,7);g.fill();g.restore();g.strokeStyle='#fff';g.lineCap='round';g.lineWidth=Math.max(3,r*0.18);g.beginPath();
+ g.moveTo(p[0]-r*.42,p[1]);g.lineTo(p[0]+r*.42,p[1]);if(plus){g.moveTo(p[0],p[1]-r*.42);g.lineTo(p[0],p[1]+r*.42)}g.stroke()}
+function link(x,y,sc){if(sc<=0)return;const t=P(x,y,Z+0.25),b=P(x,y,-Z+0.25),m=[t[0]+(b[0]-t[0])*sc,t[1]+(b[1]-t[1])*sc];
+ g.lineCap='round';g.strokeStyle='#34A853';g.lineWidth=6;g.beginPath();g.moveTo(t[0],t[1]);g.lineTo(m[0],m[1]);g.stroke()}
+function ring(x,y,z,r,al,col){const c=P(x,y,z);g.strokeStyle=col;g.globalAlpha=al;g.lineWidth=3;g.beginPath();g.ellipse(c[0],c[1],r*C30*S*1.15,r*S30*S*0.9*1.15,0,0,7);g.stroke();g.globalAlpha=1}
+function squig(x0,y0,z0,x1,y1,z1,prog,ph){const n=90;g.lineCap='round';g.lineJoin='round';g.lineWidth=6;g.strokeStyle='#FBBC04';g.beginPath();
+ for(let i=0;i<=n*prog;i++){const t=i/n,x=x0+(x1-x0)*t,y=y0+(y1-y0)*t,z=z0+(z1-z0)*t;const p=P(x,y,z);const o=Math.sin(t*16+ph)*0.28*S;i?g.lineTo(p[0]+o,p[1]):g.moveTo(p[0]+o,p[1])}g.stroke()}
+function arrowF(){const a=P(7.2,-5.2,-3.2),b=P(7.2,-5.2,3.6);g.lineCap='round';g.strokeStyle='#9AA0A6';g.lineWidth=10;g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]+18);g.stroke();
+ g.fillStyle='#9AA0A6';g.beginPath();g.moveTo(b[0],b[1]-6);g.lineTo(b[0]-16,b[1]+22);g.lineTo(b[0]+16,b[1]+22);g.closePath();g.fill();
+ g.fillStyle='#5F6368';g.font='500 26px "Google Sans",Roboto,Arial';g.textAlign='left';g.fillText('Field F',b[0]+26,b[1]+14)}
+const ST=[['Bilayer','Two graphene sheets, AB-stacked','A perpendicular field opens a tunable gap.'],
+ ['Light in','A photon arrives','Its energy creates an electron–hole pair.'],
+ ['Bind','The pair binds into an exciton','Electron on top, hole below: an interlayer exciton.'],
+ ['Move','It travels as one neutral particle','No net charge, but it carries energy.'],
+ ['Bend?','Does its path bend sideways?','That is what this project asks: exciton Berry curvature.'],
+ ['Light out','It recombines and glows','A photon leaves, almost straight up.']];
+ST.forEach(s=>{const d=document.createElement('div');d.textContent=s[0];chips.appendChild(d)});
+const T=19;let last=-1,trail=[];
+function cl(t){return Math.max(0,Math.min(1,t))}
+function ease(t){t=cl(t);return t*t*(3-2*t)}
+function back(t){t=cl(t);const c=1.2;return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2)}
+function pos(t){let x=-2.6,y=-1.8;if(t>8.5)x=-2.6+5.4*ease((t-8.5)/7);if(t>12.5)y=-1.8+3.4*ease((t-12.5)/3.2);return [x,y]}
+function frame(ms){const t=(ms/1000)%T,ph=t<2.6?0:t<4.6?1:t<8.5?2:t<12.5?3:t<15.8?4:5;
+ if(ph!=last){[...chips.children].forEach((d,i)=>d.className=i==ph?'on':i<ph?'done':'');cap.style.opacity=0;setTimeout(()=>{cap.innerHTML=ST[ph][1]+'<small>'+ST[ph][2]+'</small>';cap.style.opacity=1},150);if(ph==0)trail=[];last=ph}
+ g.clearRect(0,0,W,H);const [x,y]=pos(t);
+ const inB=back(t/1.1),inT=back((t-0.35)/1.1);
+ arrowF();
+ plate(-Z-(1-inB)*3,'#FCE8E6','#F6AEA9','#D93025',0,cl(t/0.5));
+ const sE=t<4.6?0:t<15.8?back((t-4.6)/0.7):1-ease((t-15.8)/0.6),sH=t<4.8?0:t<15.8?back((t-4.8)/0.7):1-ease((t-15.8)/0.6);
+ plate(Z+(1-inT)*3,'rgba(232,240,254,0.78)','#8AB4F8','#1A73E8',0,cl((t-0.3)/0.5));
+ if(t>8.5){trail.push([x,y]);if(trail.length>900)trail.shift();g.lineCap='round';g.lineJoin='round';g.lineWidth=5;
+  for(let k=1;k<trail.length;k+=2){const p=P(trail[k-1][0],trail[k-1][1],Z),q=P(trail[k][0],trail[k][1],Z);g.strokeStyle='rgba(52,168,83,'+(0.15+0.7*k/trail.length)+')';g.beginPath();g.moveTo(p[0],p[1]);g.lineTo(q[0],q[1]);g.stroke()}}
+ const sC=t<5.4?0:t<15.6?ease((t-5.4)/0.7):1-ease((t-15.6)/0.4);link(x,y,sC);
+ if(t>5.8&&t<15.6){for(let k=0;k<3;k++){const u=((t-5.8)/1.8+k/3)%1;ring(x,y,Z,0.7+1.6*u,0.55*(1-u)*Math.min(1,(t-5.8)/0.6),'#34A853')}}
+ if(t>4.4&&t<5.6){const u=(t-4.4)/1.2;ring(x,y,Z,0.4+2.6*ease(u),0.8*(1-u),'#FBBC04')}
+ ball(x,y,-Z+0.25,'#EA4335',true,sH);
+ ball(x,y,Z+0.25,'#4285F4',false,sE);
+ if(t>2.6&&t<4.9){squig(x-9,y-2,9,x,y,Z+0.4,ease((t-2.6)/1.6),t*10)}
+ if(t>16.2){const u=ease((t-16.2)/1.8);squig(x,y,Z+0.4,x,y,Z+0.4+8*u,1,t*10)}
+ if(ph==4){const q=P(x+1.2,y+1.2,Z+1.4);tag.style.left=(q[0]+20)+'px';tag.style.top=(q[1]-20)+'px';tag.style.opacity=1}else tag.style.opacity=0;
+ requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+</script>
+</body></html>
