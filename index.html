@@ -1150,7 +1150,9 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   }
   // Presenter: this window stays put and becomes the presenter view; the slides open as a new
   // window on the projector. The presenter view can therefore never leave the laptop.
-  let pw = null, slidesFull = false, slidesOn = '', firstPressUsed = false;
+  // kept for this tab, so a refresh picks the running show back up
+  let pw = null, slidesFull = false, slidesOn = sessionStorage.getItem('cqts-slides-on') || '', firstPressUsed = false;
+  let slidesAlive = false, currentSlides = sessionStorage.getItem('cqts-slides-id') || '';
   let autoFull = localStorage.getItem('cqts-autofull') !== '0';
   const NEXT_KEYS = ['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter', 'MediaTrackNext'];
   async function startPresenter() {
@@ -1163,7 +1165,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
       stopSlides(id);
       pw = window.open(url, `slides${id}`, 'popup,width=1280,height=720');    // moved to the other display by hand
       if (!pw) return openStart('The slides window was blocked. Allow pop-ups for this site, then try again.');
-      slidesOn = '';
+      slidesOn = ''; rememberSlides(id);
       return setPresenter(true);
     }
     if (target === details.currentScreen)
@@ -1173,14 +1175,22 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     pw = window.open(url, `slides${id}`, `popup,fullscreen,left=${target.availLeft},top=${target.availTop},width=${target.availWidth},height=${target.availHeight}`);
     if (!pw) return openStart('The slides window was blocked. Allow pop-ups for this site, then try again.');
     slidesOn = screenName(target); slidesFull = false; firstPressUsed = false;
+    rememberSlides(id);
     window.focus();
     setPresenter(true);
   }
   // closes any slides window, including one left over from before a page reload
   function stopSlides(keep) {
     chan?.postMessage({ type: 'end', keep });
-    pw?.close(); pw = null; slidesFull = false;
+    pw?.close(); pw = null; slidesFull = false; slidesAlive = false;
+    if (!keep) { currentSlides = ''; slidesOn = ''; sessionStorage.removeItem('cqts-slides-id'); sessionStorage.removeItem('cqts-slides-on'); }
   }
+  function rememberSlides(id) {
+    currentSlides = id;
+    sessionStorage.setItem('cqts-slides-id', id);
+    sessionStorage.setItem('cqts-slides-on', slidesOn);
+  }
+  const slidesOpen = () => (pw && !pw.closed) || slidesAlive;
   async function resetDisplays() {
     stopSlides();
     setPresenter(false);
@@ -1191,11 +1201,13 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
 
   // A new window cannot go full screen by itself. A click or key press here lends it permission.
   function fullscreenSlides() {
-    if (!pw || pw.closed || slidesFull) return;
+    if (slidesFull || !slidesOpen()) return;
+    if ((!pw || pw.closed) && currentSlides) { try { pw = window.open('', `slides${currentSlides}`); } catch { return; } }   // after a refresh
+    if (!pw) return;
     try { pw.postMessage('fullscreen', { targetOrigin: location.origin, delegate: 'fullscreen' }); } catch {}
   }
   function updateBanner() {
-    const live = pw && !pw.closed;
+    const live = slidesOpen();
     $('pfs').hidden = !(live && slidesOn && !slidesFull);
     $('rehearse').textContent = !isPresenter || !live ? ''
       : slidesOn ? `Slides on ${slidesOn}`
@@ -1219,7 +1231,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   // With the setting on, the first key or clicker press fills the display and does not also change slide.
   addEventListener('keydown', e => {
     if (noteClicker(e)) return;
-    if (!autoFull || e.key === 'Escape' || !pw || pw.closed || !slidesOn || slidesFull) return;
+    if (!autoFull || e.key === 'Escape' || !slidesOpen() || !slidesOn || slidesFull) return;
     fullscreenSlides();
     if (!firstPressUsed && NEXT_KEYS.includes(e.key)) { firstPressUsed = true; e.preventDefault(); e.stopImmediatePropagation(); }
   }, true);
@@ -1231,11 +1243,14 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   }
   $('sfull').onclick = () => setAutoFull(!autoFull);
   setAutoFull(autoFull);
-  setInterval(() => { if (pw?.closed) { pw = null; updateBanner(); } }, 700);
+  setInterval(() => { if (pw?.closed) { pw = null; slidesAlive = false; updateBanner(); } }, 700);
 
   // the slides window
+  let reportSlides = null;
   if (audience) {
-    const report = () => chan?.postMessage({ type: 'slides', full: !!document.fullscreenElement });
+    const report = () => chan?.postMessage({ type: 'slides', id: slidesId, full: !!document.fullscreenElement, black: body.classList.contains('black') });
+    reportSlides = report;
+    addEventListener('pagehide', () => chan?.postMessage({ type: 'slides-gone', id: slidesId }));
     addEventListener('message', e => {
       if (e.origin === location.origin && e.data === 'fullscreen') document.documentElement.requestFullscreen().catch(() => {});
     });
@@ -1336,7 +1351,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   }
   // A clicker is plugged into the computer, so it has its own indicator, apart from the remotes.
   // Three ways to recognise one: USB identity (WebHID), keys only clickers send, and how brief a press is.
-  let clickerAt = 0, clickerFresh = false, hidDev = null, pairing = false, pairT;
+  let clickerAt = +sessionStorage.getItem('cqts-clicker-at') || 0, clickerFresh = false, hidDev = null, pairing = false, pairT;
   const clickerName = () => hidDev?.productName || 'Clicker';
   function renderClicker() {
     const on = !!clickerAt || !!hidDev;
@@ -1353,6 +1368,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   function seeClicker() {
     if (!clickerAt && !hidDev) flash('Clicker detected');
     clickerAt = Date.now(); clickerFresh = true;
+    sessionStorage.setItem('cqts-clicker-at', clickerAt);
     renderClicker();
   }
   const reportClicker = () => { if (audience) chan?.postMessage({ type: 'clicker' }); else seeClicker(); };
@@ -1369,7 +1385,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     });
     navigator.hid.addEventListener('disconnect', e => {
       if (!hidDev || hidKey(e.device) !== hidKey(hidDev)) return;
-      const n = clickerName(); hidDev = null; clickerAt = 0; flash(`${n} disconnected`); renderClicker();
+      const n = clickerName(); hidDev = null; clickerAt = 0; sessionStorage.removeItem('cqts-clicker-at'); flash(`${n} disconnected`); renderClicker();
     });
   }
   async function detectClicker() {
@@ -1558,8 +1574,13 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     if (e.data?.type === 'black') setBlack(e.data.on, true);
     if (e.data?.type === 'end' && audience && e.data.keep !== slidesId) window.close();
     if (e.data?.type === 'clicker' && !audience) seeClicker();
+    if (e.data?.type === 'who' && audience) reportSlides?.();
+    if (e.data?.type === 'slides-gone' && !audience && e.data.id === currentSlides) { slidesAlive = false; slidesFull = false; updateBanner(); }
     if (e.data?.type === 'slides' && !audience) {
-      slidesFull = e.data.full; updateBanner();
+      slidesAlive = true; slidesFull = e.data.full;
+      if (!currentSlides) currentSlides = e.data.id;
+      if (e.data.black) setBlack(true, true);
+      updateBanner();
       if (!slidesFull && autoFull) fullscreenSlides();   // works while the click that opened the window still counts
     }
   };
@@ -1568,21 +1589,31 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   let clockOn = false;
   function startClock() {
     if (clockOn) return; clockOn = true;
-    let base = Date.now(), held = null, size = 22;
+    const saved = JSON.parse(sessionStorage.getItem('cqts-timer') || 'null');
+    let base = saved?.base ?? Date.now(), held = saved?.held ?? null, size = +localStorage.getItem('cqts-notes') || 22;
+    const keep = () => {
+      sessionStorage.setItem('cqts-timer', JSON.stringify({ base, held }));
+      $('tpause').textContent = held === null ? 'Pause' : 'Resume';
+      $('timer').classList.toggle('paused', held !== null);
+    };
+    document.documentElement.style.setProperty('--notes', size + 'px');
     const pad = v => String(v).padStart(2, '0');
     const tick = () => {
       const s = Math.floor(((held ?? Date.now()) - base) / 1000);
       $('timer').textContent = `${pad(Math.floor(s / 60))}:${pad(s % 60)}`;
       $('clock').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     };
-    setInterval(tick, 500); tick();
+    setInterval(tick, 500); tick(); keep();
     $('tpause').onclick = () => {
       if (held === null) held = Date.now(); else { base += Date.now() - held; held = null; }
-      $('tpause').textContent = held === null ? 'Pause' : 'Resume';
-      $('timer').classList.toggle('paused', held !== null);
+      keep();
     };
-    $('treset').onclick = () => { base = Date.now(); if (held !== null) held = base; tick(); };
-    const font = d => { size = Math.max(16, Math.min(40, size + d)); document.documentElement.style.setProperty('--notes', size + 'px'); };
+    $('treset').onclick = () => { base = Date.now(); if (held !== null) held = base; keep(); tick(); };
+    const font = d => {
+      size = Math.max(16, Math.min(40, size + d));
+      localStorage.setItem('cqts-notes', size);
+      document.documentElement.style.setProperty('--notes', size + 'px');
+    };
     $('timer').onclick = () => $('tpause').onclick();
     $('tsmall').onclick = () => font(-2);
     $('tlarge').onclick = () => font(2);
@@ -1590,6 +1621,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   const baseTitle = document.title;
   function setPresenter(on) {
     isPresenter = on;
+    if (!audience) localStorage.setItem('cqts-mode', on ? 'presenter' : 'viewer');
     body.classList.toggle('presenter', on);
     document.title = on ? 'Presenter · ' + baseTitle : baseTitle;
     document.querySelectorAll('#seg button').forEach(b => {
@@ -1610,11 +1642,13 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   fit();
   go((parseInt(location.hash.slice(1), 10) || 1) - 1, { fromHash: true, instant: true });
   body.classList.toggle('audience', audience);
+  const resume = !audience && localStorage.getItem('cqts-mode') === 'presenter' && innerWidth > 720;
   if (!audience && room && localStorage.getItem('cqts-remote-on')) connectRemote();
-  setPresenter(false);
+  setPresenter(resume);
+  if (resume) chan?.postMessage({ type: 'who' });      // is a slides window still open from before the refresh?
   fit();
   renderDevices();
-  if (firstVisit) openStart();
+  if (firstVisit && !resume) openStart();
   const ready = () => body.classList.add('ready');
   (document.fonts?.ready || Promise.resolve()).then(ready); setTimeout(ready, 1200);
 })();

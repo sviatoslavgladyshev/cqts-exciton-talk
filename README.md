@@ -32,6 +32,7 @@ A self-contained HTML slide deck with its own viewer: no build step, no framewor
 Click the right part of a slide to go forward and the left third to go back. On a phone, swipe.
 Move the pointer to bring up the toolbar, and hover over its timeline to preview any slide. In Presenter, click the timer to pause it; notes size is in Settings.
 The address bar keeps the slide number (`#12`), so you can link to a single slide.
+You can refresh at any time: the mode, slide, timer, notes size and a running slides window all carry on. A new tab keeps the mode, but starts its own timer.
 
 **Presenting with a projector or second monitor:** set it to *Extended* in System Settings → Displays (not mirrored), open the site in
 Chrome or Edge, and press **P** or choose *Presenter* in the toolbar. The first time, click *Find second display* and allow access to your displays.
