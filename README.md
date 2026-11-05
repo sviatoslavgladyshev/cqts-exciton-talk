@@ -22,7 +22,7 @@ A self-contained HTML slide deck with its own viewer: no build step, no framewor
 | **F** | Full screen |
 | **G** | All slides, grouped by section (arrow keys and Enter work here) |
 | **N** | Speaker notes |
-| **P** | Switch between Viewer and Presenter (also the switch in the control bar) |
+| **P** | Switch between Viewer and Presenter (also the switch in the toolbar) |
 | **D** | Settings: choose a display, reset the displays, turn automatic full screen on or off |
 | **R** | Phone or tablet remote: scan the QR code |
 | **B** or **.** | Black screen; any key brings the slide back |
@@ -30,11 +30,11 @@ A self-contained HTML slide deck with its own viewer: no build step, no framewor
 | Esc | Close the grid, notes or shortcuts |
 
 Click the right part of a slide to go forward and the left third to go back. On a phone, swipe.
-Move the pointer to bring up the control bar, and hover over its timeline to preview any slide.
+Move the pointer to bring up the toolbar, and hover over its timeline to preview any slide. In Presenter, click the timer to pause it; notes size is in Settings.
 The address bar keeps the slide number (`#12`), so you can link to a single slide.
 
 **Presenting with a projector or second monitor:** set it to *Extended* in System Settings → Displays (not mirrored), open the site in
-Chrome or Edge, and press **P** or choose *Presenter* in the control bar. The first time, click *Find my second display* and allow access to your displays.
+Chrome or Edge, and press **P** or choose *Presenter* in the toolbar. The first time, click *Find second display* and allow access to your displays.
 
 - **Presenter:** this window stays where it is and shows your notes, timer and next slide. The slides open in a new window on the other display, with no toolbar; your first click, key or clicker press fills it without changing slide. Browsers need that one press; turn it off under *Settings* to keep the slides in a window. With one screen, the window simply switches layout.
 - **Viewer:** just the slides. Switch back with **P** or *Viewer*, which also ends the show on the projector.
@@ -42,7 +42,7 @@ Chrome or Edge, and press **P** or choose *Presenter* in the control bar. The fi
 
 Safari and Firefox cannot move windows between displays: choose Presenter, drag the slides window onto the projector, then click it and press **F**.
 
-**Phone, tablet or Apple Watch:** press **R** and scan the QR code. Connected remotes appear in that sheet, the toolbar and the presenter header. The phone gets Next, Back, Black screen, the current slide and your notes,
+**Phone, tablet or Apple Watch:** press **R** and scan the QR code. Connected remotes appear in that sheet, in Settings and at the top of the presenter screen. The phone gets Next, Back, Black screen, the current slide and your notes,
 on Wi-Fi or mobile data with no app. The Apple Watch uses two iPhone Shortcuts; the steps and addresses are under *Apple Watch* on the phone page.
 The site is static, so commands pass through the public relay [ntfy.sh](https://ntfy.sh) on a private random channel. The remote stays off until you open it,
 and only commands such as `next` are sent. Keep the QR code private, since anyone with it can change slides; *New code* cancels the old one.

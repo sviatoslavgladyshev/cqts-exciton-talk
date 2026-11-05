@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Topological Excitons in Biased Bilayer Graphene</title>
 <meta name="description" content="Research symposium talk, Center for Quantum and Topological Systems, NYU Abu Dhabi">
-<meta name="theme-color" content="#08080b">
+<meta name="theme-color" content="#000000">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Topological excitons in biased bilayer graphene">
 <meta property="og:description" content="Research symposium talk, Center for Quantum and Topological Systems, NYU Abu Dhabi">
@@ -19,18 +19,15 @@
 :root{
   --ui:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   --ease:cubic-bezier(.32,.72,0,1);
-  --glass:rgba(24,24,27,.84);
-  --glass-line:rgba(255,255,255,.13);
-  --ink:#f5f5f7;--ink-2:rgba(235,235,245,.72);--ink-3:rgba(235,235,245,.5);
-  --tint:#a78bfa;
+  --ink:#f5f5f7;--ink-2:rgba(235,235,245,.62);--ink-3:rgba(235,235,245,.36);
+  --tint:#0a84ff;
 }
 html,body{margin:0;height:100%;overflow:hidden;font-family:var(--ui);-webkit-font-smoothing:antialiased;
-  background:#08080b radial-gradient(90% 90% at 12% 0%,rgba(78,5,126,.20),transparent 62%) no-repeat;}
-body::before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(80% 80% at 92% 100%,rgba(13,64,166,.20),transparent 62%)}
+  background:#000;}
 body.idle{cursor:none}
 #stage{position:fixed;inset:0;overflow:hidden}
-#deck{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center center;background:#fff;overflow:hidden;border-radius:18px;
-  box-shadow:0 0 0 1px rgba(255,255,255,.06),0 30px 90px rgba(0,0,0,.55);opacity:0;transition:opacity .7s ease}
+#deck{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center center;background:#fff;overflow:hidden;border-radius:14px;
+  opacity:0;transition:opacity .7s ease}
 body.ready #deck{opacity:1}
 :fullscreen #deck{border-radius:0;box-shadow:none}
 body.full #deck{border-radius:0;box-shadow:none}
@@ -50,229 +47,207 @@ body.full #deck{border-radius:0;box-shadow:none}
 .slide aside{display:none}
 .slide .embed{background:#fff;pointer-events:none}
 
-/* ---------- glass, shared by every floating surface ---------- */
-.glass{background:var(--glass);-webkit-backdrop-filter:saturate(180%) blur(28px);backdrop-filter:saturate(180%) blur(28px);
-  box-shadow:inset 0 0 0 1px var(--glass-line),inset 0 1px 0 rgba(255,255,255,.08),0 18px 50px rgba(0,0,0,.42),0 2px 8px rgba(0,0,0,.22);color:var(--ink)}
+/* ---------- surfaces ---------- */
+.glass{background:rgba(30,30,32,.8);-webkit-backdrop-filter:saturate(180%) blur(30px);backdrop-filter:saturate(180%) blur(30px);
+  box-shadow:0 0 0 .5px rgba(255,255,255,.14),0 16px 48px rgba(0,0,0,.45);color:var(--ink)}
+button{font-family:inherit}
 
 /* ---------- control bar ---------- */
-#bar{position:fixed;left:50%;bottom:22px;width:min(780px,calc(100vw - 24px));transform:translateX(-50%);padding:12px 12px 8px;border-radius:24px;z-index:10;
-  transition:opacity .38s ease,transform .5s var(--ease);font-size:13px;user-select:none;-webkit-user-select:none}
-body.idle #bar{opacity:0;transform:translate(-50%,14px);pointer-events:none}
-#row{display:flex;align-items:center;gap:2px;margin-top:6px}
-#bar button{all:unset;box-sizing:border-box;position:relative;width:38px;height:36px;display:grid;place-items:center;border-radius:11px;cursor:pointer;color:var(--ink);
-  transition:background .18s,transform .18s var(--ease),color .18s;-webkit-tap-highlight-color:transparent}
-#bar button svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
-#bar button:hover{background:rgba(255,255,255,.11)}
-#bar button:active{transform:scale(.9)}
+#bar{position:fixed;left:50%;bottom:20px;width:min(520px,calc(100vw - 24px));transform:translateX(-50%);padding:9px 8px 6px;border-radius:18px;z-index:10;
+  transition:opacity .34s ease,transform .5s var(--ease);font-size:13px;user-select:none;-webkit-user-select:none}
+body.idle #bar{opacity:0;transform:translate(-50%,10px);pointer-events:none}
+#row{display:flex;align-items:center;gap:0;margin-top:4px}
+#bar button{all:unset;box-sizing:border-box;position:relative;width:36px;height:34px;display:grid;place-items:center;border-radius:9px;cursor:pointer;color:var(--ink);
+  transition:background .16s,opacity .16s;-webkit-tap-highlight-color:transparent}
+#bar button svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#bar button:hover{background:rgba(255,255,255,.1)}
 #bar button:focus-visible{outline:2px solid var(--tint);outline-offset:1px}
-#bar button:disabled{color:var(--ink-3);cursor:default;background:none;transform:none}
-#bar button.on{color:#fff;background:rgba(255,255,255,.17)}
-#count{min-width:62px;text-align:center;font-variant-numeric:tabular-nums;color:var(--ink);font-weight:500;letter-spacing:.01em;white-space:nowrap}
-#count i{font-style:normal;color:var(--ink-3)}
-#chapter{flex:1;min-width:0;padding:0 12px;text-align:center;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sep{width:1px;height:18px;background:rgba(255,255,255,.12);margin:0 5px}
+#bar button:disabled{opacity:.28;cursor:default;background:none}
+#count{min-width:58px;text-align:center;font-variant-numeric:tabular-nums;color:var(--ink);font-weight:500;white-space:nowrap}
+#count i{font-style:normal;color:var(--ink-3);font-weight:400}
 
-/* Viewer | Presenter switch */
-#seg{display:flex;flex:none;padding:2px;margin:0 6px;border-radius:11px;background:rgba(255,255,255,.09)}
-#bar #seg button{width:auto;height:30px;padding:0 13px;border-radius:9px;font-size:13px;font-weight:500;color:var(--ink-2);display:block;line-height:30px}
+/* Viewer | Presenter */
+#seg{display:flex;flex:none;padding:2px;margin:0 auto;border-radius:9px;background:rgba(255,255,255,.08)}
+#bar #seg button{width:auto;height:28px;padding:0 12px;border-radius:7px;font-size:13px;font-weight:500;color:var(--ink-2);display:block;line-height:28px}
 #bar #seg button:hover{background:none;color:var(--ink)}
-#bar #seg button.on{background:rgba(255,255,255,.22);color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+#bar #seg button.on{background:rgba(255,255,255,.2);color:#fff}
 
-/* tooltips */
-#bar button[data-tip]::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 12px);left:50%;transform:translate(-50%,4px);padding:5px 9px;border-radius:8px;white-space:nowrap;
-  background:rgba(20,20,23,.94);box-shadow:inset 0 0 0 1px var(--glass-line);color:var(--ink);font-size:12px;font-weight:500;opacity:0;pointer-events:none;transition:opacity .14s,transform .2s var(--ease)}
-#bar button[data-tip]:hover::after{opacity:1;transform:translate(-50%,0);transition-delay:.45s}
-#bar button:disabled::after{display:none}
-
-/* chapter scrubber */
-#scrub{display:flex;gap:3px;height:14px;align-items:center;cursor:pointer;padding:0 4px;touch-action:none}
-.ch{position:relative;height:4px;flex:var(--n) 1 0;border-radius:4px;background:rgba(255,255,255,.17);overflow:hidden;transition:height .2s var(--ease)}
-.ch b{position:absolute;inset:0 auto 0 0;width:0;background:#fff;border-radius:inherit;transition:width .4s var(--ease)}
-#scrub:hover .ch{height:7px}
-#peek{position:fixed;width:256px;padding:6px;border-radius:16px;z-index:11;opacity:0;pointer-events:none;transform:translateY(6px) scale(.97);transform-origin:50% 100%;transition:opacity .16s,transform .26s var(--ease);font-size:12px}
+/* timeline */
+#scrub{display:flex;gap:2px;height:12px;align-items:center;cursor:pointer;padding:0 8px;touch-action:none}
+.ch{position:relative;height:3px;flex:var(--n) 1 0;border-radius:3px;background:rgba(255,255,255,.16);overflow:hidden;transition:height .18s var(--ease)}
+.ch b{position:absolute;inset:0 auto 0 0;width:0;background:#fff;transition:width .35s var(--ease)}
+#scrub:hover .ch{height:6px}
+#peek{position:fixed;width:240px;padding:5px;border-radius:14px;z-index:11;opacity:0;pointer-events:none;transform:translateY(4px);transition:opacity .14s,transform .22s var(--ease);font-size:12px}
 #peek.on{opacity:1;transform:none}
-#peek img{display:block;width:100%;aspect-ratio:16/9;border-radius:11px;background:#fff}
-#peek div{padding:7px 6px 4px;color:var(--ink);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#peek img{display:block;width:100%;aspect-ratio:16/9;border-radius:10px;background:#fff}
+#peek div{padding:6px 6px 3px;color:var(--ink);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #peek span{color:var(--ink-3);font-variant-numeric:tabular-nums;margin-right:6px}
 
-/* notes */
-#notes{position:fixed;left:50%;bottom:138px;transform:translate(-50%,10px) scale(.985);width:min(780px,calc(100vw - 24px));max-height:36vh;overflow:auto;border-radius:20px;padding:18px 22px;
-  font-size:17px;line-height:1.55;letter-spacing:-.003em;opacity:0;visibility:hidden;transition:opacity .22s,transform .4s var(--ease),visibility 0s linear .22s,bottom .5s var(--ease);z-index:9}
-body.show-notes #notes{opacity:1;visibility:visible;transform:translateX(-50%);transition:opacity .22s,transform .4s var(--ease),visibility 0s,bottom .5s var(--ease)}
-body.idle #notes{bottom:22px}
+/* notes in Viewer */
+#notes{position:fixed;left:50%;bottom:112px;transform:translate(-50%,8px);width:min(640px,calc(100vw - 24px));max-height:34vh;overflow:auto;border-radius:18px;padding:16px 20px;
+  font-size:16px;line-height:1.5;opacity:0;visibility:hidden;transition:opacity .2s,transform .4s var(--ease),visibility 0s linear .2s,bottom .5s var(--ease);z-index:9}
+body.show-notes #notes{opacity:1;visibility:visible;transform:translateX(-50%);transition:opacity .2s,transform .4s var(--ease),visibility 0s,bottom .5s var(--ease)}
+body.idle #notes{bottom:20px}
 
-/* slide overview */
-#grid{position:fixed;inset:0;overflow:auto;z-index:20;padding:clamp(20px,4vw,56px);background:rgba(10,10,13,.9);-webkit-backdrop-filter:blur(40px);backdrop-filter:blur(40px);
-  opacity:0;visibility:hidden;transition:opacity .28s ease,visibility 0s linear .28s;color:var(--ink)}
-body.show-grid #grid{opacity:1;visibility:visible;transition:opacity .28s ease,visibility 0s}
-#gridin{max-width:1560px;margin:0 auto;transform:scale(.975);transition:transform .5s var(--ease)}
-body.show-grid #gridin{transform:none}
-#grid header{display:flex;align-items:baseline;justify-content:space-between;gap:20px;margin-bottom:6px}
-#grid h1{margin:0;font-size:32px;font-weight:700;letter-spacing:-.02em}
-#grid header p{margin:0;color:var(--ink-3);font-size:14px;white-space:nowrap}
-#grid h2{margin:34px 0 14px;font-size:15px;font-weight:600;color:var(--ink-2);letter-spacing:-.005em}
-.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(236px,1fr));gap:26px 22px}
+/* all slides */
+#grid{position:fixed;inset:0;overflow:auto;z-index:20;padding:clamp(20px,4vw,56px);background:rgba(0,0,0,.92);-webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px);
+  opacity:0;visibility:hidden;transition:opacity .24s ease,visibility 0s linear .24s;color:var(--ink)}
+body.show-grid #grid{opacity:1;visibility:visible;transition:opacity .24s ease,visibility 0s}
+#gridin{max-width:1480px;margin:0 auto}
+#grid h2{margin:36px 0 14px;font-size:13px;font-weight:500;color:var(--ink-3)}
+#grid h2:first-child{margin-top:0}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(236px,1fr));gap:24px 20px}
 #grid a{display:block;color:var(--ink);text-decoration:none;font-size:13px;outline:none;-webkit-tap-highlight-color:transparent}
-#grid a img{width:100%;aspect-ratio:16/9;border-radius:12px;display:block;background:#fff;box-shadow:0 6px 22px rgba(0,0,0,.38);transition:transform .34s var(--ease),box-shadow .2s}
-#grid a:hover img{transform:scale(1.025)}
-#grid a.cur img{box-shadow:0 0 0 2px #0b0b0e,0 0 0 4px var(--ink-2),0 6px 22px rgba(0,0,0,.38)}
-#grid a.sel img,#grid a:focus-visible img{box-shadow:0 0 0 2px #0b0b0e,0 0 0 4.5px var(--tint),0 8px 28px rgba(0,0,0,.5);transform:scale(1.025)}
-#grid a span{display:flex;gap:7px;margin-top:9px;line-height:1.3;color:var(--ink-2)}
-#grid a span b{font-weight:500;color:var(--ink-3);font-variant-numeric:tabular-nums}
+#grid a img{width:100%;aspect-ratio:16/9;border-radius:9px;display:block;background:#fff;transition:transform .3s var(--ease)}
+#grid a:hover img{transform:scale(1.015)}
+#grid a.cur img{box-shadow:0 0 0 2px #000,0 0 0 3.5px rgba(255,255,255,.5)}
+#grid a.sel img,#grid a:focus-visible img{box-shadow:0 0 0 2px #000,0 0 0 4px var(--tint)}
+#grid a span{display:flex;gap:7px;margin-top:8px;line-height:1.3;color:var(--ink-2)}
+#grid a span b{font-weight:400;color:var(--ink-3);font-variant-numeric:tabular-nums}
 
-/* sheets and HUDs */
-#help{position:fixed;left:50%;top:50%;width:min(560px,calc(100vw - 24px));max-height:calc(100vh - 32px);overflow:auto;padding:26px 28px;border-radius:26px;z-index:30;transform:translate(-50%,-48%) scale(.96);opacity:0;visibility:hidden;
-  transition:opacity .2s,transform .42s var(--ease),visibility 0s linear .2s}
-body.show-help #help{opacity:1;visibility:visible;transform:translate(-50%,-50%);transition:opacity .2s,transform .42s var(--ease),visibility 0s}
-#help h2{margin:0 0 16px;font-size:21px;font-weight:700;letter-spacing:-.015em}
-#help dl{display:grid;grid-template-columns:1fr auto;gap:10px 24px;margin:0;font-size:14px;align-items:center}
+/* sheets */
+.scrim{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:16px;background:rgba(0,0,0,.45);opacity:0;visibility:hidden;transition:opacity .22s,visibility 0s linear .22s}
+body.show-start #start,body.show-remote #remote,body.show-help #help{opacity:1;visibility:visible;transition:opacity .22s,visibility 0s}
+.sheet{width:min(440px,100%);max-height:calc(100vh - 32px);overflow:auto;padding:20px;border-radius:22px;background:#1c1c1e;box-shadow:0 0 0 .5px rgba(255,255,255,.1),0 24px 70px rgba(0,0,0,.6);color:var(--ink);transform:scale(.97);transition:transform .4s var(--ease)}
+body.show-start #start .sheet,body.show-remote #remote .sheet,body.show-help #help .sheet{transform:none}
+.sheethead{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sheet h2{margin:0;font-size:17px;font-weight:600;letter-spacing:-.01em}
+.link{all:unset;cursor:pointer;font-size:15px;font-weight:400;color:var(--tint)}
+.link:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
+.quiet{color:var(--ink-2);font-size:13px}
+#dstatus{margin:0 0 12px;font-size:13px;line-height:1.45;color:var(--ink-2)}
+#dstatus:empty{display:none}
+
+/* grouped list, as in System Settings */
+.group{border-radius:11px;background:#2c2c2e;overflow:hidden;margin-bottom:14px}
+.group[hidden]{display:none}
+.rowi{all:unset;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:14px;width:100%;min-height:42px;padding:8px 13px;font-size:14px;color:var(--ink)}
+.rowi[hidden]{display:none}
+.rowi+.rowi{box-shadow:inset 0 .5px 0 rgba(255,255,255,.1)}
+button.rowi{cursor:pointer}
+button.rowi:hover{background:rgba(255,255,255,.05)}
+button.rowi:focus-visible{outline:2px solid var(--tint);outline-offset:-2px}
+.val{color:var(--ink-2);display:flex;align-items:center;gap:7px;white-space:nowrap;min-width:0}
+.chev::after{content:"›";margin-left:2px;color:var(--ink-3);font-size:17px;line-height:1}
+.val.ok{color:var(--ink)}
+.val.ok::before{content:"";width:7px;height:7px;border-radius:50%;background:#30d158}
+#picker{display:flex;gap:2px;padding:2px;border-radius:8px;background:rgba(255,255,255,.08);min-width:0}
+#picker button{all:unset;box-sizing:border-box;cursor:pointer;padding:4px 11px;border-radius:6px;font-size:13px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#picker button.on{background:rgba(255,255,255,.2);color:#fff}
+#picker button:focus-visible{outline:2px solid var(--tint)}
+#sfull{all:unset;flex:none;position:relative;width:40px;height:24px;border-radius:12px;cursor:pointer;background:rgba(255,255,255,.18);transition:background .2s}
+#sfull::after{content:"";position:absolute;left:2px;top:2px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.35);transition:transform .26s var(--ease)}
+#sfull[aria-checked=true]{background:#30d158}
+#sfull[aria-checked=true]::after{transform:translateX(16px)}
+#sfull:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
+.mini{display:flex;gap:6px}
+.mini button{all:unset;cursor:pointer;min-width:30px;padding:4px 10px;border-radius:7px;text-align:center;font-size:13px;color:var(--ink);background:rgba(255,255,255,.1)}
+.mini button:hover{background:rgba(255,255,255,.17)}
+.mini button:focus-visible{outline:2px solid var(--tint)}
+#modes{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#modes[hidden]{display:none}
+.btn{all:unset;box-sizing:border-box;cursor:pointer;display:block;text-align:center;padding:10px;border-radius:10px;font-size:14px;font-weight:500;color:var(--ink);background:rgba(255,255,255,.1);transition:background .16s}
+.btn:hover{background:rgba(255,255,255,.16)}
+.btn.primary{background:#f5f5f7;color:#000}
+.btn.primary:hover{background:#fff}
+.btn:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
+.btn[hidden]{display:none}
+#mreset{display:block;margin:14px auto 0;font-size:13px;color:var(--ink-3)}
+#mreset:hover{color:var(--ink-2)}
+
+/* remote */
+#remote .sheet{width:min(340px,100%);text-align:center}
+#remote .sheethead{justify-content:flex-end;margin-bottom:0}
+#rqrwrap{position:relative;width:196px;margin:0 auto 18px}
+#rqr{background:#fff;padding:12px;border-radius:14px;aspect-ratio:1;display:grid;place-items:center;color:#202124;font-size:13px}
+#rqr svg{width:100%;height:100%;display:block}
+#remote h2{font-size:19px}
+#rhint{margin:5px 0 14px;font-size:13px;line-height:1.4;color:var(--ink-2)}
+#rdevs{text-align:left}
+#rdevs:empty{display:none}
+#rstatus{display:none}
+#rfoot{display:flex;justify-content:center;gap:18px;font-size:13px}
+#rfoot button{all:unset;cursor:pointer;color:var(--ink-3)}
+#rfoot button:hover{color:var(--ink-2)}
+#rfoot button:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
+#rok{position:absolute;inset:0;display:grid;place-items:center;border-radius:14px;background:rgba(255,255,255,.96);opacity:0;pointer-events:none}
+#rok svg{width:64px;height:64px;fill:#30d158}
+#rok path{fill:none;stroke:#fff;stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:40;stroke-dashoffset:40}
+#rok.on{animation:rokfade 2.2s ease both}
+#rok.on svg{animation:rokpop .5s cubic-bezier(.34,1.4,.64,1) both}
+#rok.on path{animation:rokdraw .36s .2s ease forwards}
+@keyframes rokfade{0%{opacity:0}8%,80%{opacity:1}100%{opacity:0}}
+@keyframes rokpop{from{transform:scale(.5)}to{transform:none}}
+@keyframes rokdraw{to{stroke-dashoffset:0}}
+
+/* shortcuts */
+#help .sheet{width:min(400px,100%)}
+#help dl{display:grid;grid-template-columns:1fr auto;gap:9px 20px;margin:0;font-size:13.5px;align-items:center;color:var(--ink-2)}
 #help dd{margin:0;text-align:right;white-space:nowrap}
-#help p{margin:18px 0 0;font-size:13px;line-height:1.45;color:var(--ink-2)}
-kbd{display:inline-block;min-width:24px;padding:3px 7px;margin-left:3px;border-radius:7px;background:rgba(255,255,255,.1);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1),0 1px 0 rgba(0,0,0,.4);font:500 12px var(--ui);text-align:center;color:var(--ink)}
-#jump{position:fixed;left:50%;top:44px;transform:translateX(-50%);padding:10px 18px;border-radius:16px;font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;z-index:25;opacity:0;pointer-events:none;transition:opacity .16s}
-#jump.on{opacity:1}
+kbd{display:inline-block;min-width:22px;padding:2px 6px;margin-left:3px;border-radius:5px;background:rgba(255,255,255,.1);font:500 12px var(--ui);text-align:center;color:var(--ink)}
+#jump{position:fixed;left:50%;top:18px;transform:translate(-50%,-6px);padding:8px 15px;border-radius:999px;font-size:13px;font-weight:500;font-variant-numeric:tabular-nums;z-index:45;opacity:0;pointer-events:none;transition:opacity .18s,transform .36s var(--ease)}
+#jump.on{opacity:1;transform:translate(-50%,0)}
 #jump i{font-style:normal;color:var(--ink-2);font-weight:400;margin-right:6px}
 #black{position:fixed;inset:0;background:#000;z-index:15;opacity:0;pointer-events:none;transition:opacity .4s ease}
 body.black #black{opacity:1;pointer-events:auto}
 
-/* connected devices */
-.dev{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:rgba(48,209,88,.15);color:var(--ink);font-size:12.5px;font-weight:500;white-space:nowrap}
-.dev i{width:7px;height:7px;border-radius:50%;background:#30d158;box-shadow:0 0 6px rgba(48,209,88,.8)}
-.dev.off{background:rgba(255,255,255,.08);color:var(--ink-2)}
-.dev.off i{background:var(--ink-3);box-shadow:none}
-.dev.ping{animation:devping .7s var(--ease)}
-@keyframes devping{0%{transform:scale(1);background:rgba(48,209,88,.6)}35%{transform:scale(1.09)}100%{transform:scale(1)}}
-#pdevs,#bdevs{display:flex;gap:6px;flex:none;align-items:center}
-#pdevs:empty,#bdevs:empty{display:none}
-.clk{display:inline-flex;align-items:center;gap:6px;flex:none;padding:4px 10px 4px 7px;border-radius:9px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);color:var(--ink-2);font-size:12.5px;font-weight:500;white-space:nowrap}
-.clk svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.3;stroke-linecap:round}
-.clk.on{color:#30d158;box-shadow:inset 0 0 0 1px rgba(48,209,88,.55)}
-.clk.ping{animation:devping .7s var(--ease)}
-#bclk{display:none;margin-left:8px}
-#bclk.on{display:inline-flex}
-#bdevs{margin-left:8px;max-width:230px;overflow:hidden}
-#rdevs{display:flex;flex-direction:column;gap:7px;margin:0 0 12px}
-#rdevs:empty{display:none}
-.drow{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.drow small{font-size:12.5px;color:var(--ink-2)}
-#rqrwrap{position:relative}
-#rok{position:absolute;inset:0;display:grid;place-items:center;border-radius:18px;background:rgba(255,255,255,.93);opacity:0;pointer-events:none}
-#rok svg{width:96px;height:96px;fill:#30d158;stroke:none}
-#rok path{fill:none;stroke:#fff;stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:40;stroke-dashoffset:40}
-#rok.on{animation:rokfade 2.4s ease both}
-#rok.on svg{animation:rokpop .55s cubic-bezier(.34,1.56,.64,1) both}
-#rok.on path{animation:rokdraw .4s .22s ease forwards}
-@keyframes rokfade{0%{opacity:0}8%,78%{opacity:1}100%{opacity:0}}
-@keyframes rokpop{from{transform:scale(.4)}to{transform:none}}
-@keyframes rokdraw{to{stroke-dashoffset:0}}
-#clkrow{display:flex;align-items:center;gap:10px;margin-top:10px;padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.06);font-size:13.5px;color:var(--ink-2)}
-#clkrow i{width:8px;height:8px;border-radius:50%;background:var(--ink-3)}
-#clkrow.ok{color:var(--ink)}
-#clkrow.ok i{background:#30d158;box-shadow:0 0 6px rgba(48,209,88,.8)}
-
-/* phone remote */
-#remote{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:16px;background:rgba(0,0,0,.5);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);opacity:0;visibility:hidden;transition:opacity .24s,visibility 0s linear .24s}
-body.show-remote #remote{opacity:1;visibility:visible;transition:opacity .24s,visibility 0s}
-#remotecard{display:grid;grid-template-columns:240px 1fr;gap:26px;align-items:center;width:min(680px,100%);padding:28px;border-radius:28px}
-#rqr{background:#fff;padding:16px;border-radius:18px;aspect-ratio:1;display:grid;place-items:center;color:#202124;font-size:13px}
-#rqr svg{width:100%;height:100%;display:block}
-#remotecard h2{margin:0 0 8px;font-size:24px;font-weight:700;letter-spacing:-.02em}
-#remotecard p{margin:0 0 10px;font-size:14px;line-height:1.45;color:var(--ink-2)}
-#rstatus{color:var(--ink)!important;font-weight:500}
-#rstatus[hidden]{display:none}
-#rlink{color:var(--tint)}
-#rbtns{display:flex;gap:8px;margin-top:6px}
-#rbtns button{all:unset;cursor:pointer;padding:8px 14px;border-radius:10px;font-size:13px;font-weight:500;color:var(--ink);background:rgba(255,255,255,.1)}
-#rbtns button:hover{background:rgba(255,255,255,.17)}
-#rbtns button:focus-visible{outline:2px solid var(--tint)}
-
-/* start sheet: choose a mode and a display */
-#start{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:16px;background:rgba(0,0,0,.5);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
-  opacity:0;visibility:hidden;transition:opacity .24s,visibility 0s linear .24s}
-body.show-start #start{opacity:1;visibility:visible;transition:opacity .24s,visibility 0s}
-#startcard{width:min(640px,100%);max-height:calc(100vh - 32px);overflow:auto;padding:30px;border-radius:28px;transform:scale(.96);transition:transform .45s var(--ease)}
-body.show-start #startcard{transform:none}
-#startcard h2{margin:0;font-size:26px;font-weight:700;letter-spacing:-.02em}
-#dstatus{margin:8px 0 0;font-size:14px;line-height:1.5;color:var(--ink-2)}
-#picker{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
-#picker:empty{display:none}
-#picker button{all:unset;box-sizing:border-box;cursor:pointer;padding:9px 14px;border-radius:12px;font-size:14px;font-weight:500;color:var(--ink);background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1px transparent;transition:background .18s,box-shadow .18s}
-#picker button:hover{background:rgba(255,255,255,.14)}
-#picker button.on{background:rgba(167,139,250,.2);box-shadow:inset 0 0 0 1.5px var(--tint)}
-#picker button:focus-visible,#modes button:focus-visible,#allow:focus-visible,#mskip:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
-#modes{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
-#modes[hidden]{display:none}
-#modes button{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;justify-content:flex-start;padding:18px;border-radius:18px;background:rgba(255,255,255,.08);transition:background .18s,transform .3s var(--ease)}
-#modes button:hover{background:rgba(255,255,255,.14);transform:translateY(-2px)}
-#modes button:active{transform:scale(.98)}
-#modes svg{display:block;width:30px;height:30px;margin-bottom:12px;fill:none;stroke:var(--ink);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-#modes b{display:block;font-size:17px;font-weight:600;letter-spacing:-.01em;color:var(--ink)}
-#modes span{display:block;margin-top:4px;font-size:13px;line-height:1.4;color:var(--ink-2)}
-#allow{all:unset;box-sizing:border-box;cursor:pointer;display:block;width:100%;margin-top:20px;padding:13px;border-radius:14px;text-align:center;font-size:15px;font-weight:600;color:#fff;background:#4E057E;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
-#allow:hover{background:#5f0a99}
-#allow[hidden]{display:none}
-#setrow{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:16px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.06)}
-#setrow b{display:block;font-size:14px;font-weight:600}
-#setrow span{display:block;margin-top:2px;font-size:12.5px;color:var(--ink-2)}
-#sfull{all:unset;flex:none;position:relative;width:46px;height:28px;border-radius:14px;cursor:pointer;background:rgba(255,255,255,.2);transition:background .22s}
-#sfull::after{content:"";position:absolute;left:2px;top:2px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.4);transition:transform .28s var(--ease)}
-#sfull[aria-checked=true]{background:#30d158}
-#sfull[aria-checked=true]::after{transform:translateX(18px)}
-#sfull:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
-#startfoot{display:flex;justify-content:space-between;gap:16px;margin-top:18px}
-#mskip,#mreset{all:unset;cursor:pointer;font-size:13px;color:var(--ink-2)}
-#mskip:hover,#mreset:hover{color:var(--ink)}
-#mreset:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
+/* the slides window */
 body.audience,body.audience #stage{cursor:none;background:#000}
-body.audience::before,body.audience #bar,body.audience #notes,body.audience #jump,body.audience #peek{display:none}
+body.audience #bar,body.audience #notes,body.audience #jump,body.audience #peek{display:none}
 
 /* ---------- presenter view ---------- */
 #phead,#pv,#pnotes{display:none}
 body.presenter{cursor:auto}
 body.presenter .slide,body.presenter .slide.active{transition:none!important}
-body.presenter #stage{right:40%;top:84px;bottom:112px}
-body.presenter #bar{left:30%;width:min(calc(60vw - 32px),640px);bottom:16px}
-body.presenter #bnotes,body.presenter #notes{display:none}
-body.presenter #chapter{visibility:hidden}
-body.presenter #bdevs,body.presenter #bclk,body.presenter #bclk.on{display:none}
-body.presenter #phead{display:flex;position:fixed;left:0;right:0;top:0;height:76px;align-items:center;gap:34px;padding:0 28px;color:var(--ink);box-shadow:inset 0 -1px 0 rgba(255,255,255,.08)}
-#phead .lab,#pv .lab{font-size:12px;font-weight:500;color:var(--ink-3);margin-bottom:2px}
-#timer,#clock{font-size:30px;font-weight:600;letter-spacing:-.015em;font-variant-numeric:tabular-nums;line-height:1.1}
+body.presenter #stage{right:40%;top:68px;bottom:92px}
+body.presenter #deck{border-radius:10px}
+body.presenter #bar{left:30%;bottom:18px;background:none;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none}
+body.presenter #notes{display:none}
+body.presenter #phead{display:flex;position:fixed;left:0;right:0;top:0;height:68px;align-items:center;gap:22px;padding:0 28px 0 32px;color:var(--ink)}
+#timer{all:unset;cursor:pointer;font-size:32px;font-weight:300;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
 #timer.paused{color:var(--ink-3)}
-#clock{font-weight:400;color:var(--ink-2)}
-#ptools #pfs{background:#4E057E;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
-#ptools #pfs[hidden]{display:none}
-#ptools{margin-left:auto;flex:none;display:flex;gap:6px}
-#ptools button{all:unset;cursor:pointer;padding:7px 13px;border-radius:10px;font-size:13px;font-weight:500;color:var(--ink);background:rgba(255,255,255,.08);transition:background .18s}
-#ptools button:hover{background:rgba(255,255,255,.16)}
-#ptools button:focus-visible{outline:2px solid var(--tint)}
-body.presenter #pv{display:block;position:fixed;right:0;top:84px;width:40%;padding:12px 28px 0 8px;color:var(--ink)}
-#nextwrap{position:relative;width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:rgba(255,255,255,.05);display:grid;place-items:center;color:var(--ink-3);font-size:15px}
+#clock{font-size:15px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+#rehearse{flex:1;min-width:0;font-size:13px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pfs{all:unset;flex:none;cursor:pointer;padding:6px 12px;border-radius:8px;font-size:13px;font-weight:500;color:#000;background:#f5f5f7}
+#pfs[hidden]{display:none}
+#pfs:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
+#pstat{display:flex;align-items:center;gap:16px;flex:none}
+#pdevs{display:flex;gap:16px}
+#pdevs:empty{display:none}
+.st{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--ink-3);white-space:nowrap}
+.st i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2)}
+.st.on{color:var(--ink-2)}
+.st.on i{background:#30d158}
+.st.off i{background:rgba(255,255,255,.2)}
+.st.ping i{animation:stping .6s var(--ease)}
+@keyframes stping{0%{transform:scale(1)}40%{transform:scale(2.2)}100%{transform:scale(1)}}
+#pgear{all:unset;cursor:pointer;display:grid;place-items:center;width:32px;height:32px;border-radius:8px;color:var(--ink-2)}
+#pgear:hover{background:rgba(255,255,255,.1);color:var(--ink)}
+#pgear:focus-visible{outline:2px solid var(--tint)}
+#pgear svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+body.presenter #pv{display:block;position:fixed;right:0;top:68px;width:40%;padding:16px 32px 0 12px;color:var(--ink)}
+#pv .lab{font-size:13px;color:var(--ink-3);margin-bottom:8px}
+#nextwrap{position:relative;width:100%;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#fff;display:grid;place-items:center;color:var(--ink-3);font-size:14px}
 #nextwrap .slide{visibility:visible;opacity:1;transition:none;transform-origin:0 0;pointer-events:none}
-#nextwrap{background:#fff}
 #nextwrap.end{background:rgba(255,255,255,.05)}
-#rehearse{min-width:120px;flex:1;font-size:13px;line-height:1.35;color:var(--ink-2)}
-body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;top:calc(84px + 12px + 22px + (40vw - 36px) * .5625 + 18px);overflow:auto;padding:4px 28px 24px 8px;font-size:var(--notes,22px);line-height:1.5;letter-spacing:-.005em;color:var(--ink)}
+body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;top:calc(68px + 16px + 26px + (40vw - 44px) * .5625 + 20px);overflow:auto;padding:0 32px 24px 12px;font-size:var(--notes,22px);line-height:1.45;letter-spacing:-.006em;color:var(--ink)}
 
 /* ---------- small screens ---------- */
 @media (max-width:720px){
-  #chapter,.sep,#seg,#bdevs,#bclk,#bclk.on,#bar #bpres,#bar #bhelp,#bar #bremote{display:none}
-  #remotecard{grid-template-columns:1fr}
+  #seg,#bar #bpres{display:none}
   #row{justify-content:space-between}
   #count{flex:1}
-  #deck{border-radius:10px}
+  #deck{border-radius:8px}
   #bar{bottom:calc(10px + env(safe-area-inset-bottom))}
   .tiles{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:18px 14px}
-  #grid header p{display:none}
-  #modes{grid-template-columns:1fr}
 }
-@media (hover:none){#scrub:hover .ch{height:4px}#peek,#bar button[data-tip]::after{display:none}}
+@media (hover:none){#scrub:hover .ch{height:3px}#peek{display:none}}
 
 /* print: one slide per page */
 @page{size:1920px 1080px;margin:0}
 @media print{
   html,body{overflow:visible;background:#fff}
-  body::before,#bar,#notes,#grid,#phead,#pv,#pnotes,#help,#jump,#black,#peek,#start,#seg,#remote{display:none!important}
+  #bar,#notes,#grid,#phead,#pv,#pnotes,#help,#jump,#black,#peek,#start,#seg,#remote{display:none!important}
   #stage{position:static}
   #deck{position:static;transform:none!important;box-shadow:none;width:auto;height:auto;overflow:visible;border-radius:0;opacity:1}
   .slide{position:relative;visibility:visible;opacity:1!important;transform:none!important;page-break-after:always;break-after:page}
@@ -771,19 +746,14 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
 <div id="grid" aria-label="All slides"><div id="gridin"></div></div>
 
 <header id="phead">
-  <div><div class="lab">Elapsed</div><div id="timer">00:00</div></div>
-  <div><div class="lab">Time</div><div id="clock">--:--</div></div>
-  <div id="pclk" class="clk"><svg viewBox="0 0 16 16"><rect x="5" y="1.500" width="6" height="13" rx="2.200"/><path d="M8 4.500v2M8 10v1.500"/></svg><span></span></div>
-  <div id="pdevs"></div>
+  <button id="timer" title="Pause or resume">00:00</button>
+  <span id="clock"></span>
   <div id="rehearse"></div>
-  <div id="ptools">
-    <button id="pfs" hidden>Make slides full screen</button>
-    <button id="pdisp">Settings</button>
-    <button id="premote">Remote</button>
-    <button id="tpause">Pause</button>
-    <button id="treset">Reset</button>
-    <button id="tsmall" aria-label="Smaller notes">A−</button>
-    <button id="tlarge" aria-label="Larger notes">A+</button>
+  <button id="pfs" hidden>Fill screen</button>
+  <div id="pstat">
+    <span id="pdevs"></span>
+    <span id="pclk" class="st"><i></i>Clicker</span>
+    <button id="pgear" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3.500v2.200M12 18.300v2.200M3.500 12h2.200M18.300 12h2.200M6 6l1.550 1.550M16.450 16.450 18 18M6 18l1.550-1.550M16.450 7.550 18 6"/></svg></button>
   </div>
 </header>
 <div id="pv">
@@ -792,33 +762,61 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
 </div>
 <div id="pnotes"></div>
 
-<div id="start" role="dialog" aria-label="Start presenting">
-  <div id="startcard" class="glass">
-    <h2 id="starttitle">Start presenting</h2>
+<div id="start" class="scrim" role="dialog" aria-label="Settings">
+  <div class="sheet">
+    <div class="sheethead"><h2 id="starttitle">Settings</h2><button id="mskip" class="link">Done</button></div>
     <p id="dstatus"></p>
-    <div id="picker"></div>
-    <button id="allow" hidden>Find my second display</button>
-    <div id="modes">
-      <button id="mpres"><svg viewBox="0 0 30 30"><rect x="2.500" y="6" width="15" height="11" rx="2"/><path d="M21 9.500h6.500M21 14h6.500M21 18.500h6.500M7 22h6M10 17v5"/></svg><b>Presenter mode</b><span id="mpresd"></span></button>
-      <button id="mslides"><svg viewBox="0 0 30 30"><rect x="3.500" y="6" width="23" height="15" rx="2.500"/><path d="m12.500 10 6 3.500-6 3.500z"/><path d="M11 25h8"/></svg><b>Slides only</b><span id="mslidesd"></span></button>
+    <div class="group">
+      <div class="rowi" id="rowpick"><span>Slides on</span><div id="picker"></div></div>
+      <div class="rowi"><span>Fill the display</span><button id="sfull" role="switch" aria-checked="true" aria-label="Fill the display"></button></div>
     </div>
-    <div id="setrow"><div><b>Full screen on the slides display</b><span>Slides fill the display at your first click, key or clicker press.</span></div><button id="sfull" role="switch" aria-checked="true" aria-label="Full screen on the slides display"></button></div>
-    <div id="clkrow"><i></i><span id="clkstate"></span></div>
-    <div id="startfoot"><button id="mskip">Just browse the slides</button><button id="mreset">Reset displays</button></div>
+    <div class="group">
+      <button class="rowi" id="rowremote"><span>Phone remote</span><span class="val chev" id="remval">Off</span></button>
+      <div class="rowi" id="clkrow"><span>Clicker</span><span class="val" id="clkstate">Press a button to test</span></div>
+    </div>
+    <div class="group" id="prow">
+      <div class="rowi"><span>Timer</span><div class="mini"><button id="tpause">Pause</button><button id="treset">Reset</button></div></div>
+      <div class="rowi"><span>Notes size</span><div class="mini"><button id="tsmall" aria-label="Smaller notes">−</button><button id="tlarge" aria-label="Larger notes">+</button></div></div>
+    </div>
+    <div class="group"><button class="rowi" id="rowhelp"><span>Keyboard shortcuts</span><span class="val chev"></span></button></div>
+    <button id="allow" class="btn primary" hidden>Find second display</button>
+    <div id="modes">
+      <button id="mslides" class="btn">Slides only</button>
+      <button id="mpres" class="btn primary">Start presenting</button>
+    </div>
+    <button id="mreset" class="link">Reset displays</button>
   </div>
 </div>
 
-<div id="remote" role="dialog" aria-label="Phone remote">
-  <div id="remotecard" class="glass">
+<div id="remote" class="scrim" role="dialog" aria-label="Phone remote">
+  <div class="sheet">
+    <div class="sheethead"><button id="rclose" class="link">Done</button></div>
     <div id="rqrwrap"><div id="rqr"></div><div id="rok"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24"/><path d="m15 27 8 8 15-17"/></svg></div></div>
-    <div>
-      <h2 id="rtitle">Phone or tablet remote</h2>
-      <p id="rhint"></p>
-      <p id="rstatus">Connecting…</p>
-      <div id="rdevs"></div>
-      <p>Apple Watch setup is on the phone page. <a id="rlink" target="_blank" rel="noopener">Open remote here</a></p>
-      <div id="rbtns"><button id="rclose">Done</button><button id="rnew">New code</button><button id="roff">Turn off</button></div>
-    </div>
+    <h2 id="rtitle">Scan to connect</h2>
+    <p id="rhint"></p>
+    <p id="rstatus"></p>
+    <div id="rdevs" class="group"></div>
+    <a id="rlink" hidden></a>
+    <div id="rfoot"><button id="rnew">New code</button><button id="roff">Turn off</button></div>
+  </div>
+</div>
+
+<div id="help" class="scrim" role="dialog" aria-label="Keyboard shortcuts">
+  <div class="sheet">
+    <div class="sheethead"><h2>Keyboard shortcuts</h2><button id="hclose" class="link">Done</button></div>
+    <dl>
+      <dt>Next</dt><dd><kbd>→</kbd><kbd>Space</kbd></dd>
+      <dt>Previous</dt><dd><kbd>←</kbd></dd>
+      <dt>First or last slide</dt><dd><kbd>Home</kbd><kbd>End</kbd></dd>
+      <dt>Jump to a slide</dt><dd><kbd>12</kbd><kbd>Return</kbd></dd>
+      <dt>Viewer or Presenter</dt><dd><kbd>P</kbd></dd>
+      <dt>All slides</dt><dd><kbd>G</kbd></dd>
+      <dt>Settings</dt><dd><kbd>D</kbd></dd>
+      <dt>Phone remote</dt><dd><kbd>R</kbd></dd>
+      <dt>Speaker notes</dt><dd><kbd>N</kbd></dd>
+      <dt>Black screen</dt><dd><kbd>B</kbd></dd>
+      <dt>Full screen</dt><dd><kbd>F</kbd></dd>
+    </dl>
   </div>
 </div>
 
@@ -826,45 +824,19 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
 <div id="jump" class="glass"></div>
 <div id="black"></div>
 
-<div id="help" class="glass" role="dialog" aria-label="Keyboard shortcuts">
-  <h2>Keyboard shortcuts</h2>
-  <dl>
-    <dt>Next</dt><dd><kbd>→</kbd><kbd>Space</kbd></dd>
-    <dt>Previous</dt><dd><kbd>←</kbd></dd>
-    <dt>First or last slide</dt><dd><kbd>Home</kbd><kbd>End</kbd></dd>
-    <dt>Jump to a slide</dt><dd><kbd>12</kbd><kbd>Return</kbd></dd>
-    <dt>All slides</dt><dd><kbd>G</kbd></dd>
-    <dt>Speaker notes</dt><dd><kbd>N</kbd></dd>
-    <dt>Switch Viewer / Presenter</dt><dd><kbd>P</kbd></dd>
-    <dt>Displays and settings</dt><dd><kbd>D</kbd></dd>
-    <dt>Phone or tablet remote</dt><dd><kbd>R</kbd></dd>
-    <dt>Black screen</dt><dd><kbd>B</kbd></dd>
-    <dt>Full screen</dt><dd><kbd>F</kbd></dd>
-    <dt>Close</dt><dd><kbd>Esc</kbd></dd>
-  </dl>
-  <p>Clickers work as soon as they are plugged in: forward, back, start and blank screen.</p>
-</div>
-
 <nav id="bar" class="glass" aria-label="Slide controls">
   <div id="scrub" role="slider" aria-label="Slide position"></div>
   <div id="row">
-    <button id="bprev" aria-label="Previous slide" data-tip="Previous  ←"><svg viewBox="0 0 24 24"><path d="M14.5 5.5 8 12l6.5 6.5"/></svg></button>
+    <button id="bprev" aria-label="Previous slide"><svg viewBox="0 0 24 24"><path d="M14.500 5.500 8 12l6.500 6.500"/></svg></button>
     <span id="count"></span>
-    <button id="bnext" aria-label="Next slide" data-tip="Next  →"><svg viewBox="0 0 24 24"><path d="M9.5 5.5 16 12l-6.5 6.5"/></svg></button>
-    <div id="bclk" class="clk"><svg viewBox="0 0 16 16"><rect x="5" y="1.500" width="6" height="13" rx="2.200"/><path d="M8 4.500v2M8 10v1.500"/></svg><span></span></div>
-    <div id="bdevs"></div>
-    <div id="chapter"></div>
+    <button id="bnext" aria-label="Next slide"><svg viewBox="0 0 24 24"><path d="M9.500 5.500 16 12l-6.500 6.500"/></svg></button>
     <div id="seg" role="group" aria-label="Mode">
-      <button data-m="viewer" data-tip="Switch mode  P">Viewer</button>
-      <button data-m="presenter" data-tip="Switch mode  P">Presenter</button>
+      <button data-m="viewer">Viewer</button>
+      <button data-m="presenter">Presenter</button>
     </div>
-    <button id="bgrid" aria-label="All slides" data-tip="All slides  G"><svg viewBox="0 0 24 24"><rect x="4" y="4.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4.5" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/></svg></button>
-    <button id="bnotes" aria-label="Speaker notes" data-tip="Notes  N"><svg viewBox="0 0 24 24"><rect x="4.5" y="4" width="15" height="16" rx="3"/><path d="M8.5 9h7M8.5 12.5h7M8.5 16h4"/></svg></button>
-    <button id="bpres" aria-label="Displays and settings" data-tip="Settings  D"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="11.5" rx="2.4"/><path d="M12 16.5V20M8.5 20h7"/></svg></button>
-    <button id="bremote" aria-label="Phone remote" data-tip="Phone remote  R"><svg viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2.400"/><path d="M11 17.800h2"/></svg></button>
-    <button id="bhelp" aria-label="Keyboard shortcuts" data-tip="Shortcuts  ?"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M9.7 9.6a2.4 2.4 0 1 1 3.7 2c-.9.6-1.4 1-1.4 2"/><path d="M12 16.6v.01"/></svg></button>
-    <div class="sep"></div>
-    <button id="bfull" aria-label="Full screen" data-tip="Full screen  F"><svg viewBox="0 0 24 24"><path d="M4.5 9V6.5a2 2 0 0 1 2-2H9M15 4.5h2.5a2 2 0 0 1 2 2V9M19.5 15v2.500a2 2 0 0 1-2 2H15M9 19.500H6.500a2 2 0 0 1-2-2V15"/></svg></button>
+    <button id="bgrid" aria-label="All slides" title="All slides"><svg viewBox="0 0 24 24"><rect x="4" y="4.500" width="6.500" height="6.500" rx="1.600"/><rect x="13.500" y="4.500" width="6.500" height="6.500" rx="1.600"/><rect x="4" y="13.500" width="6.500" height="6.500" rx="1.600"/><rect x="13.500" y="13.500" width="6.500" height="6.500" rx="1.600"/></svg></button>
+    <button id="bpres" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3.500v2.200M12 18.300v2.200M3.500 12h2.200M18.300 12h2.200M6 6l1.550 1.550M16.450 16.450 18 18M6 18l1.550-1.550M16.450 7.550 18 6"/></svg></button>
+    <button id="bfull" aria-label="Full screen" title="Full screen"><svg viewBox="0 0 24 24"><path d="M4.500 9V6.500a2 2 0 0 1 2-2H9M15 4.500h2.500a2 2 0 0 1 2 2V9M19.500 15v2.500a2 2 0 0 1-2 2H15M9 19.500H6.500a2 2 0 0 1-2-2V15"/></svg></button>
   </div>
 </nav>
 
@@ -900,7 +872,6 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     if (s.dataset.section || !chapters.length) chapters.push({ name: s.dataset.section || '', from: i, to: i });
     chapters[chapters.length - 1].to = i;
   });
-  const chapterAt = i => chapters.find(c => i >= c.from && i <= c.to);
 
   // ---------- scale to window ----------
   function fit() {
@@ -972,7 +943,6 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     cur = n;
     wakeMedia(next); playBuilds(next);
     $('count').innerHTML = `${n + 1} <i>/ ${N}</i>`;
-    $('chapter').textContent = chapterAt(n).name;
     $('bprev').disabled = n === 0;
     $('bnext').disabled = n === N - 1;
     chapters.forEach((c, i) => {
@@ -1041,7 +1011,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   scrub.addEventListener('pointercancel', () => { scrubbing = false; peek.classList.remove('on'); });
 
   // ---------- overview ----------
-  $('gridin').innerHTML = `<header><h1>All slides</h1><p>${N} slides</p></header>` + chapters.map(c => {
+  $('gridin').innerHTML = chapters.map(c => {
     let h = `<h2>${c.name}</h2><div class="tiles">`;
     for (let i = c.from; i <= c.to; i++)
       h += `<a href="#${i + 1}" data-i="${i}"><img loading="lazy" src="${thumb(i)}" alt=""><span><b>${i + 1}</b><em style="font-style:normal">${titleOf(i)}</em></span></a>`;
@@ -1082,8 +1052,6 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     bprev: () => step(-1),
     bnext: () => step(1),
     bgrid: toggleGrid,
-    bnotes: () => toggle('show-notes'),
-    bhelp: () => { body.classList.remove('show-grid'); toggle('show-help'); },
     bfull: () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(),
     bpres: () => openStart()
   };
@@ -1109,31 +1077,26 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     const l = allScreens(), many = l.length > 1;
     const ext = !!window.screen.isExtended;
     const ask = canPlace && !details && access === 'prompt' && ext;
-    const manual = !canPlace || access === 'denied';
-    let msg;
+    let msg = '';
     if (startNote) msg = startNote;
-    else if (many) msg = 'Choose the display for your slides.';
-    else if (ask) msg = 'A second display is connected. Allow this site to use it so the slides can go there.';
-    else if (access === 'denied') msg = 'Display access is blocked for this site. Allow “Window management” in the site settings next to the address bar, or drag this window onto the other display first.';
-    else if (!canPlace) msg = 'This browser cannot move slides to another display by itself. Drag this window onto the other display first, or use Chrome or Edge.';
-    else msg = 'Only this display is detected. If your second display or projector shows a copy of this screen, or nothing, set it to Extended in System Settings → Displays.';
+    else if (ask) msg = 'A second display is connected. Allow access to use it.';
+    else if (access === 'denied') msg = 'Display access is blocked. Allow “Window management” in the site settings, or drag the slides across yourself.';
+    else if (!canPlace) msg = 'This browser cannot reach a second display. Use Chrome or Edge, or drag the slides across yourself.';
+    else if (!many) msg = 'One display found. To use another, set it to Extended in System Settings → Displays.';
     $('dstatus').textContent = msg;
     const picker = $('picker'); picker.textContent = '';
     if (many) l.forEach(s => {
       const b = document.createElement('button');
-      b.textContent = screenName(s) + (s === details.currentScreen ? ' (this window)' : '');
+      b.textContent = screenName(s);
       b.className = s === target ? 'on' : '';
       b.onclick = () => { target = s; renderStart(); };
       picker.append(b);
     });
-    $('starttitle').textContent = isPresenter ? 'Change displays' : 'Start presenting';
-    $('mskip').textContent = isPresenter ? 'Keep the current setup' : 'Just browse the slides';
+    $('rowpick').hidden = !many;
+    $('prow').hidden = !isPresenter;
     $('allow').hidden = !ask;
     $('modes').hidden = ask;
-    const where = many ? screenName(target) : 'this display';
-    $('mpresd').textContent = many ? `Slides on ${where}. This window becomes your notes, timer and next slide.`
-      : manual ? 'This window shows your notes. The slides open in a new window for you to drag across.' : 'Notes, timer and next slide on this screen.';
-    $('mslidesd').textContent = `Full-screen slides on ${where}, with no notes.`;
+    $('mpres').textContent = isPresenter ? 'Move slides here' : 'Start presenting';
   }
   async function loadDisplays(ask) {
     if (!canPlace) return renderStart();
@@ -1175,16 +1138,16 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
       if (canPlace && access !== 'denied') return setPresenter(true);        // one display: switch in place
       stopSlides(id);
       pw = window.open(url, `slides${id}`, 'popup,width=1280,height=720');    // moved to the other display by hand
-      if (!pw) return openStart('The browser blocked the slides window. Allow pop-ups for this site, then try again.');
+      if (!pw) return openStart('The slides window was blocked. Allow pop-ups for this site, then try again.');
       slidesOn = '';
       return setPresenter(true);
     }
     if (target === details.currentScreen)
-      return openStart(`This window is on ${screenName(target)}. Drag it to ${screenName(others[0])}, then choose Presenter mode again.`);
+      return openStart(`Move this window to ${screenName(others[0])} first, or choose it for the slides.`);
     closeStart();
     stopSlides(id);
     pw = window.open(url, `slides${id}`, `popup,fullscreen,left=${target.availLeft},top=${target.availTop},width=${target.availWidth},height=${target.availHeight}`);
-    if (!pw) return openStart('The browser blocked the slides window. Allow pop-ups for this site, then try again.');
+    if (!pw) return openStart('The slides window was blocked. Allow pop-ups for this site, then try again.');
     slidesOn = screenName(target); slidesFull = false; firstPressUsed = false;
     window.focus();
     setPresenter(true);
@@ -1199,7 +1162,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     setPresenter(false);
     details = null; target = null;
     await loadDisplays(false);
-    openStart('Displays reset. Choose where the slides go.');
+    openStart();
   }
 
   // A new window cannot go full screen by itself. A click or key press here lends it permission.
@@ -1210,11 +1173,9 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   function updateBanner() {
     const live = pw && !pw.closed;
     $('pfs').hidden = !(live && slidesOn && !slidesFull);
-    $('rehearse').textContent = !isPresenter ? ''
-      : live && slidesFull ? `Slides are full screen on ${slidesOn || 'the other display'}.`
-      : live && slidesOn ? `Slides are on ${slidesOn}.${autoFull ? ' Click or press any key to fill the screen.' : ''}`
-      : live ? 'Drag the slides window onto the other display, then click it and press F.'
-      : 'On this screen only. To use a second display, set it to Extended in System Settings → Displays, then press D.';
+    $('rehearse').textContent = !isPresenter || !live ? ''
+      : slidesOn ? `Slides on ${slidesOn}`
+      : 'Drag the slides onto the other display, click them and press F';
   }
 
   // Viewer | Presenter: the one control for changing mode
@@ -1264,13 +1225,16 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     closeStart();
     stopSlides(); setPresenter(false);
     try { await fullscreenOn(target); }
-    catch { openStart('Almost there. Click Slides only once more to go full screen.'); }
+    catch { openStart('Click Slides only again to continue.'); }
   }
   $('mpres').onclick = startPresenter;
   $('mslides').onclick = startSlides;
   $('mskip').onclick = closeStart;
   $('mreset').onclick = resetDisplays;
-  $('pdisp').onclick = () => openStart();
+  $('pgear').onclick = () => openStart();
+  $('rowhelp').onclick = () => { body.classList.remove('show-start'); body.classList.add('show-help'); };
+  $('hclose').onclick = () => body.classList.remove('show-help');
+  $('help').addEventListener('click', e => { if (e.target === $('help')) body.classList.remove('show-help'); });
   $('allow').onclick = () => loadDisplays(true);
   $('start').addEventListener('click', e => { if (e.target === $('start')) closeStart(); });
   window.screen.addEventListener?.('change', () => { if (body.classList.contains('show-start')) loadDisplays(false); });
@@ -1284,7 +1248,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   const newRoom = () => 'cqts-' + [...crypto.getRandomValues(new Uint8Array(16))].map(b => b.toString(16).padStart(2, '0')).join('');
   const say = m => fetch(`${RELAY}${room}?cache=no`, { method: 'POST', body: m }).catch(() => {});
   const sayWhere = () => say(`at:${cur}:${body.classList.contains('black') ? 1 : 0}:${isPresenter ? 'p' : 'v'}`);
-  const remoteStatus = t => { $('rstatus').textContent = t; };
+  const remoteStatus = () => {};
   function connectRemote() {
     if (relay || audience) return;
     relay = new EventSource(`${RELAY}${room}/sse`);
@@ -1313,27 +1277,30 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   const CLICKER_ONLY = ['PageDown', 'PageUp', 'F5', 'MediaTrackNext', 'MediaTrackPrevious'];
   const ago = t => { const s = Math.round((Date.now() - t) / 1000); return s < 3 ? 'just now' : s < 60 ? `${s}s ago` : `${Math.floor(s / 60)}m ago`; };
   const isQuiet = (id, d) => id !== 'watch' && Date.now() - d.seen > QUIET;
-  function chip(id, d) {
-    const c = document.createElement('span');
-    c.className = 'dev' + (isQuiet(id, d) ? ' off' : '') + (d.fresh ? ' ping' : '');
-    c.append(document.createElement('i'), d.name);
-    return c;
-  }
+  const statusItem = (id, d) => {
+    const s = document.createElement('span');
+    s.className = 'st' + (isQuiet(id, d) ? '' : ' on') + (d.fresh ? ' ping' : '');
+    s.append(document.createElement('i'), d.name);
+    return s;
+  };
   function renderDevices() {
     const list = [...devices];
-    $('pdevs').replaceChildren(...list.map(([id, d]) => chip(id, d)));
-    $('bdevs').replaceChildren(...list.map(([id, d]) => chip(id, d)));
+    $('pdevs').replaceChildren(...list.map(([id, d]) => statusItem(id, d)));
     $('rdevs').replaceChildren(...list.map(([id, d]) => {
-      const row = document.createElement('div'); row.className = 'drow';
-      const what = document.createElement('small');
+      const row = document.createElement('div'); row.className = 'rowi';
+      const name = document.createElement('span'); name.textContent = d.name;
+      const what = document.createElement('span');
+      what.className = 'val' + (isQuiet(id, d) ? '' : ' ok');
       what.textContent = isQuiet(id, d) ? 'Not responding' : d.action ? `${d.action} · ${ago(d.seen)}` : 'Connected';
-      row.append(chip(id, d), what);
+      row.append(name, what);
       return row;
     }));
     const phones = list.filter(([id]) => id !== 'watch');
-    if (body.classList.contains('show-remote')) $('rtitle').textContent = phones.length ? `${phones[0][1].name} connected` : 'Phone or tablet remote';
-    $('rstatus').hidden = phones.length > 0;
-    $('rhint').textContent = phones.length ? 'Press Next on it to try. Scan again to add another device.' : 'Scan with your camera. It works on Wi-Fi or mobile data, with no app to install.';
+    $('rtitle').textContent = phones.length ? `${phones[0][1].name} connected` : 'Scan to connect';
+    $('rhint').textContent = phones.length ? 'Press Next to try it.' : 'Use your phone or tablet camera.';
+    const names = list.map(([, d]) => d.name).join(', ');
+    $('remval').textContent = names || (localStorage.getItem('cqts-remote-on') ? 'Waiting' : 'Off');
+    $('remval').classList.toggle('ok', !!names);
     list.forEach(([, d]) => { d.fresh = false; });
     renderClicker();
   }
@@ -1341,12 +1308,10 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   let clickerAt = 0, clickerFresh = false;
   function renderClicker() {
     const on = !!clickerAt;
-    $('clkstate').textContent = on ? `Clicker detected · last press ${ago(clickerAt)}` : 'Press a button on your clicker to test it.';
-    $('clkrow').classList.toggle('ok', on);
-    for (const el of [$('pclk'), $('bclk')]) {
-      el.className = 'clk' + (on ? ' on' : '') + (clickerFresh ? ' ping' : '');
-      el.lastChild.textContent = on ? 'Clicker detected' : 'Clicker not detected';
-    }
+    $('clkstate').textContent = on ? 'Detected' : 'Press a button to test';
+    $('clkstate').classList.toggle('ok', on);
+    $('pclk').className = 'st' + (on ? ' on' : '') + (clickerFresh ? ' ping' : '');
+    $('pclk').title = on ? 'Clicker detected' : 'No clicker detected yet';
     clickerFresh = false;
   }
   function seeClicker() {
@@ -1409,8 +1374,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     body.classList.add('show-remote');
     connectRemote(); drawQR(); renderDevices();
   }
-  $('bremote').onclick = openRemote;
-  $('premote').onclick = openRemote;
+  $('rowremote').onclick = openRemote;
   $('rclose').onclick = () => body.classList.remove('show-remote');
   $('remote').addEventListener('click', e => { if (e.target === $('remote')) body.classList.remove('show-remote'); });
   $('roff').onclick = () => { relay?.close(); relay = null; remoteSeen = false; devices.clear(); renderDevices(); localStorage.removeItem('cqts-remote-on'); body.classList.remove('show-remote'); };
@@ -1418,7 +1382,6 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     relay?.close(); relay = null; remoteSeen = false;
     devices.clear(); renderDevices();
     room = newRoom(); localStorage.setItem('cqts-room', room);
-    remoteStatus('New code ready. Scan it to connect.');
     connectRemote(); drawQR();
   };
 
@@ -1467,18 +1430,17 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     else if (k === 'End') go(N - 1);
     else if (k === 'f' || k === 'F') actions.bfull();
     else if (k === 'g' || k === 'G') toggleGrid();
-    else if (k === 'n' || k === 'N') { if (!isPresenter) actions.bnotes(); }
+    else if (k === 'n' || k === 'N') { if (!isPresenter) toggle('show-notes'); }
     else if (k === 'p' || k === 'P') switchMode(isPresenter ? 'viewer' : 'presenter');
     else if (k === 'd' || k === 'D') openStart();
     else if (k === 'r' || k === 'R') openRemote();
     else if (k === 'b' || k === 'B' || k === '.') setBlack(true);
-    else if (k === '?') actions.bhelp();
+    else if (k === '?') toggle('show-help');
     else if (k === 'Escape') { closeOverlays(); body.classList.remove('show-remote'); }
   });
 
   // click the right of a slide to advance, the left third to go back
   $('stage').addEventListener('click', e => {
-    if (body.classList.contains('show-help')) { body.classList.remove('show-help'); return; }
     const r = $('stage').getBoundingClientRect();
     step(e.clientX < r.left + r.width * 0.3 ? -1 : 1);
   });
@@ -1532,6 +1494,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     };
     $('treset').onclick = () => { base = Date.now(); if (held !== null) held = base; tick(); };
     const font = d => { size = Math.max(16, Math.min(40, size + d)); document.documentElement.style.setProperty('--notes', size + 'px'); };
+    $('timer').onclick = () => $('tpause').onclick();
     $('tsmall').onclick = () => font(-2);
     $('tlarge').onclick = () => font(2);
   }
