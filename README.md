@@ -42,13 +42,13 @@ Chrome or Edge, and press **P** or choose *Presenter* in the control bar. The fi
 
 Safari and Firefox cannot move windows between displays: choose Presenter, drag the slides window onto the projector, then click it and press **F**.
 
-**Phone, tablet or Apple Watch:** press **R** and scan the QR code. Connected devices appear in that sheet, the toolbar and the presenter header. The phone gets Next, Back, Black screen, the current slide and your notes,
+**Phone, tablet or Apple Watch:** press **R** and scan the QR code. Connected remotes appear in that sheet, the toolbar and the presenter header. The phone gets Next, Back, Black screen, the current slide and your notes,
 on Wi-Fi or mobile data with no app. The Apple Watch uses two iPhone Shortcuts; the steps and addresses are under *Apple Watch* on the phone page.
 The site is static, so commands pass through the public relay [ntfy.sh](https://ntfy.sh) on a private random channel. The remote stays off until you open it,
 and only commands such as `next` are sent. Keep the QR code private, since anyone with it can change slides; *New code* cancels the old one.
 The relay allows 250 messages a day per network, so keep a keyboard or clicker as a backup.
 
-**Clicker:** presentation remotes work with no setup. A *Clicker detected* indicator appears at the first press of a clicker-style key (PageDown, PageUp, F5 or a media key). Clickers that send arrow keys look the same as a keyboard, so they work but cannot be detected. Press **D** to test yours. Forward and back send PageDown and PageUp (or media-track keys),
+**Clicker:** presentation remotes work with no setup. The clicker has its own indicator on the presenter screen, separate from remotes, which turns to *Clicker detected* at the first press of a clicker-style key (PageDown, PageUp, F5 or a media key). Clickers that send arrow keys look the same as a keyboard, so they work but cannot be detected. Press **D** to test yours. Forward and back send PageDown and PageUp (or media-track keys),
 the start button (F5 or Shift+F5) goes full screen instead of reloading, and the blank-screen button (`.` or B) goes black.
 Holding a button moves one slide only. In Presenter mode the clicker works without any extra click. In other modes, click the browser window once so it has focus.
 
