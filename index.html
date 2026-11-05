@@ -162,8 +162,8 @@ body.show-start #startcard{transform:none}
 #allow[hidden]{display:none}
 #mskip{all:unset;cursor:pointer;display:block;margin:16px auto 0;font-size:13px;color:var(--ink-2)}
 #mskip:hover{color:var(--ink)}
-body.audience,body.audience #stage{cursor:none}
-body.audience #bar,body.audience #notes{display:none}
+body.audience,body.audience #stage{cursor:none;background:#000}
+body.audience::before,body.audience #bar,body.audience #notes,body.audience #jump,body.audience #peek{display:none}
 
 /* ---------- presenter view ---------- */
 #phead,#pv,#pnotes{display:none}
@@ -177,6 +177,8 @@ body.presenter #phead{display:flex;position:fixed;left:0;right:0;top:0;height:76
 #timer,#clock{font-size:30px;font-weight:600;letter-spacing:-.015em;font-variant-numeric:tabular-nums;line-height:1.1}
 #timer.paused{color:var(--ink-3)}
 #clock{font-weight:400;color:var(--ink-2)}
+#ptools #pfs{background:#4E057E;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+#ptools #pfs[hidden]{display:none}
 #ptools{margin-left:auto;flex:none;display:flex;gap:6px}
 #ptools button{all:unset;cursor:pointer;padding:7px 13px;border-radius:10px;font-size:13px;font-weight:500;color:var(--ink);background:rgba(255,255,255,.08);transition:background .18s}
 #ptools button:hover{background:rgba(255,255,255,.16)}
@@ -709,6 +711,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   <div><div class="lab">Time</div><div id="clock">--:--</div></div>
   <div id="rehearse"></div>
   <div id="ptools">
+    <button id="pfs" hidden>Make slides full screen</button>
     <button id="tpause">Pause</button>
     <button id="treset">Reset</button>
     <button id="tsmall" aria-label="Smaller notes">A−</button>
@@ -726,7 +729,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     <h2>Start presenting</h2>
     <p id="dstatus"></p>
     <div id="picker"></div>
-    <button id="allow" hidden>Find my projector</button>
+    <button id="allow" hidden>Find my second display</button>
     <div id="modes">
       <button id="mpres"><svg viewBox="0 0 30 30"><rect x="2.500" y="6" width="15" height="11" rx="2"/><path d="M21 9.500h6.500M21 14h6.500M21 18.500h6.500M7 22h6M10 17v5"/></svg><b>Presenter mode</b><span id="mpresd"></span></button>
       <button id="mslides"><svg viewBox="0 0 30 30"><rect x="3.500" y="6" width="23" height="15" rx="2.500"/><path d="m12.500 10 6 3.500-6 3.500z"/><path d="M11 25h8"/></svg><b>Slides only</b><span id="mslidesd"></span></button>
@@ -754,7 +757,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     <dt>Full screen</dt><dd><kbd>F</kbd></dd>
     <dt>Close</dt><dd><kbd>Esc</kbd></dd>
   </dl>
-  <p>Presentation clickers work as soon as they are plugged in: forward, back, start and blank screen.</p>
+  <p>Clickers work as soon as they are plugged in: forward, back, start and blank screen.</p>
 </div>
 
 <nav id="bar" class="glass" aria-label="Slide controls">
@@ -783,8 +786,8 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   const slides = [...deck.querySelectorAll('section.slide')];
   const N = slides.length;
   const $ = id => document.getElementById(id);
-  const companion = new URLSearchParams(location.search).has('presenter');   // the notes window opened for a projector
-  let isPresenter = companion;
+  const audience = new URLSearchParams(location.search).has('slides');   // the window shown on the projector
+  let isPresenter = false;
   const chan = 'BroadcastChannel' in window ? new BroadcastChannel('cqts-deck') : null;
   const body = document.body;
   let cur = -1, timers = [];
@@ -810,7 +813,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   // ---------- scale to window ----------
   function fit() {
     const st = $('stage').getBoundingClientRect();
-    const full = !!document.fullscreenElement || (innerHeight >= screen.height - 1 && innerWidth >= screen.width - 1);
+    const full = audience || !!document.fullscreenElement || (innerHeight >= screen.height - 1 && innerWidth >= screen.width - 1);
     body.classList.toggle('full', full && !isPresenter);
     const pad = isPresenter ? 16 : full ? 0 : innerWidth < 720 ? 6 : 24;
     const k = Math.min((st.width - pad * 2) / 1920, (st.height - pad * 2) / 1080);
@@ -1006,7 +1009,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   const pickTarget = () => {
     const l = allScreens();
     if (l.includes(target)) return;
-    target = l.find(s => !s.isInternal && s !== details.currentScreen) || l.find(s => s !== details.currentScreen) || l[0] || null;
+    target = l.find(s => !s.isInternal && s !== details.currentScreen) || l.find(s => !s.isInternal) || l.find(s => s !== details.currentScreen) || l[0] || null;
   };
   function renderStart() {
     const l = allScreens(), many = l.length > 1;
@@ -1017,9 +1020,9 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     if (startNote) msg = startNote;
     else if (many) msg = 'Choose the display for your slides.';
     else if (ask) msg = 'A second display is connected. Allow this site to use it so the slides can go there.';
-    else if (access === 'denied') msg = 'Display access is blocked for this site. Allow “Window management” in the site settings next to the address bar, or drag this window onto the projector first.';
-    else if (!canPlace) msg = 'This browser cannot move slides to another display by itself. Drag this window onto the projector first, or use Chrome or Edge.';
-    else msg = 'Only this display is detected. If the projector shows a copy of this screen, or nothing, set it to Extended in System Settings → Displays.';
+    else if (access === 'denied') msg = 'Display access is blocked for this site. Allow “Window management” in the site settings next to the address bar, or drag this window onto the other display first.';
+    else if (!canPlace) msg = 'This browser cannot move slides to another display by itself. Drag this window onto the other display first, or use Chrome or Edge.';
+    else msg = 'Only this display is detected. If your second display or projector shows a copy of this screen, or nothing, set it to Extended in System Settings → Displays.';
     $('dstatus').textContent = msg;
     const picker = $('picker'); picker.textContent = '';
     if (many) l.forEach(s => {
@@ -1032,8 +1035,8 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     $('allow').hidden = !ask;
     $('modes').hidden = ask;
     const where = many ? screenName(target) : 'this display';
-    $('mpresd').textContent = many ? `Slides on ${where}. Notes, timer and next slide on your other screen.`
-      : manual ? 'Opens your notes in a second window. Keep it on your laptop.' : 'Notes, timer and next slide on this screen.';
+    $('mpresd').textContent = many ? `Slides on ${where}. This window becomes your notes, timer and next slide.`
+      : manual ? 'This window shows your notes. The slides open in a new window for you to drag across.' : 'Notes, timer and next slide on this screen.';
     $('mslidesd').textContent = `Full-screen slides on ${where}, with no notes.`;
   }
   async function loadDisplays(ask) {
@@ -1045,6 +1048,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
           details = await window.getScreenDetails();
           access = 'granted';
           details.addEventListener('screenschange', () => { pickTarget(); renderStart(); });
+          details.addEventListener('currentscreenchange', () => { startNote = ''; renderStart(); });
         } catch { access = 'denied'; }
       }
     }
@@ -1061,41 +1065,51 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     if (document.fullscreenElement) await document.exitFullscreen();
     await document.documentElement.requestFullscreen(screen ? { screen } : {});
   }
+  // Presenter: this window stays put and becomes the presenter view; the slides open as a new
+  // window on the projector. The presenter view can therefore never leave the laptop.
+  let pw = null, slidesFull = false, slidesOn = '';
   async function startPresenter() {
-    const url = `${location.pathname}?presenter#${cur + 1}`;
+    const url = `${location.pathname}?slides#${cur + 1}`;
     const others = allScreens().filter(s => s !== target);
     if (!target || !others.length) {
       closeStart();
-      if (canPlace && access !== 'denied') return setPresenter(true);   // one display: switch in place
-      pw = window.open(url, 'presenter', 'popup,width=1400,height=850');  // the window goes to the projector by hand
-      if (!pw) openStart('The browser blocked the notes window. Allow pop-ups for this site, then try again.');
-      return;
+      if (canPlace && access !== 'denied') return setPresenter(true);        // one display: switch in place
+      pw = window.open(url, 'slides', 'popup,width=1280,height=720');         // moved to the projector by hand
+      if (!pw) return openStart('The browser blocked the slides window. Allow pop-ups for this site, then try again.');
+      slidesOn = '';
+      return setPresenter(true);
     }
-    const home = others.find(s => s.isInternal) || others[0];
+    if (target === details.currentScreen)
+      return openStart(`This window is on ${screenName(target)}. Drag it to ${screenName(others[0])}, then choose Presenter mode again.`);
     closeStart();
-    try { await fullscreenOn(target); }
-    catch { return openStart('Almost there. Click Presenter mode once more to send the slides to the display.'); }
-    // the fullscreen call and this popup share one click, which needs the display permission
-    setPresenter(false);
-    pw = window.open(url, 'presenter', `popup,left=${home.availLeft},top=${home.availTop},width=${home.availWidth},height=${home.availHeight}`);
-    if (!pw) {
-      await document.exitFullscreen().catch(() => {});
-      return openStart('The browser blocked the notes window. Allow pop-ups for this site, then try again.');
-    }
-    pw.focus();
-    body.classList.add('audience');
+    pw = window.open(url, 'slides', `popup,fullscreen,left=${target.availLeft},top=${target.availTop},width=${target.availWidth},height=${target.availHeight}`);
+    if (!pw) return openStart('The browser blocked the slides window. Allow pop-ups for this site, then try again.');
+    slidesOn = screenName(target); slidesFull = false;
+    window.focus();
+    setPresenter(true);
+  }
+  // A new window cannot go full screen by itself. A click or key press here lends it permission.
+  function fullscreenSlides() {
+    if (!pw || pw.closed || slidesFull) return;
+    try { pw.postMessage('fullscreen', { targetOrigin: location.origin, delegate: 'fullscreen' }); } catch {}
+  }
+  function updateBanner() {
+    const live = pw && !pw.closed;
+    $('pfs').hidden = !(live && slidesOn && !slidesFull);
+    $('rehearse').textContent = !isPresenter ? ''
+      : live && slidesFull ? `Slides are full screen on ${slidesOn || 'the other display'}.`
+      : live && slidesOn ? `Slides are on ${slidesOn}.`
+      : live ? 'Drag the slides window onto the other display, then click it and press F.'
+      : 'On this screen only. To use a second display, set it to Extended in System Settings → Displays, then press D.';
   }
 
   // Viewer | Presenter: the one control for changing mode
-  let pw = null;
   async function switchMode(to) {
     if (to === (isPresenter ? 'presenter' : 'viewer')) return;
     if (to === 'viewer') {
-      if (!companion) return setPresenter(false);
       chan?.postMessage({ type: 'end' });
-      window.close();
-      setTimeout(() => location.replace(`${location.pathname}#${cur + 1}`), 150);   // for a tab the script cannot close
-      return;
+      pw?.close(); pw = null;
+      return setPresenter(false);
     }
     if (canPlace && !details) await loadDisplays(false);
     if (allScreens().length > 1) return startPresenter();
@@ -1103,10 +1117,23 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     setPresenter(true);
   }
   document.querySelectorAll('#seg button').forEach(b => { b.onclick = () => { switchMode(b.dataset.m); b.blur(); }; });
-  // closing the notes window ends the show on the projector too
-  setInterval(() => {
-    if (pw?.closed) { pw = null; if (body.classList.contains('audience')) document.exitFullscreen().catch(() => {}); }
-  }, 700);
+  $('pfs').onclick = fullscreenSlides;
+  addEventListener('keydown', e => { if (e.key !== 'Escape') fullscreenSlides(); }, true);
+  addEventListener('pointerdown', fullscreenSlides, true);
+  setInterval(() => { if (pw?.closed) { pw = null; updateBanner(); } }, 700);
+
+  // the slides window
+  if (audience) {
+    const report = () => chan?.postMessage({ type: 'slides', full: !!document.fullscreenElement });
+    addEventListener('message', e => {
+      if (e.origin === location.origin && e.data === 'fullscreen') document.documentElement.requestFullscreen().catch(() => {});
+    });
+    document.addEventListener('fullscreenchange', report);
+    const goFull = () => { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {}); };
+    addEventListener('keydown', goFull); addEventListener('pointerdown', goFull);
+    report();
+  }
+
   async function startSlides() {
     closeStart();
     try { await fullscreenOn(target); }
@@ -1118,7 +1145,6 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   $('allow').onclick = () => loadDisplays(true);
   $('start').addEventListener('click', e => { if (e.target === $('start')) closeStart(); });
   window.screen.addEventListener?.('change', () => { if (body.classList.contains('show-start')) loadDisplays(false); });
-  document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement) body.classList.remove('audience'); });
 
   // typing a number then Return jumps to that slide
   const CLICKER_KEYS = ['PageDown', 'PageUp', 'MediaTrackNext', 'MediaTrackPrevious', 'F5', '.'];
@@ -1133,6 +1159,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   addEventListener('keydown', e => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     const k = e.key;
+    if (audience && /^[pdngPDNG?]$/.test(k)) return;      // the slides window only moves slides
     if (body.classList.contains('show-start')) {
       e.preventDefault();
       if (e.repeat) return;
@@ -1166,7 +1193,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     else if (k === 'g' || k === 'G') toggleGrid();
     else if (k === 'n' || k === 'N') { if (!isPresenter) actions.bnotes(); }
     else if (k === 'p' || k === 'P') switchMode(isPresenter ? 'viewer' : 'presenter');
-    else if ((k === 'd' || k === 'D') && !companion) openStart();
+    else if (k === 'd' || k === 'D') openStart();
     else if (k === 'b' || k === 'B' || k === '.') setBlack(true);
     else if (k === '?') actions.bhelp();
     else if (k === 'Escape') { closeOverlays(); body.classList.remove('show-notes'); }
@@ -1201,7 +1228,8 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   if (chan) chan.onmessage = e => {
     if (e.data?.type === 'go') go(e.data.n, { remote: true });
     if (e.data?.type === 'black') setBlack(e.data.on, true);
-    if (e.data?.type === 'end' && document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    if (e.data?.type === 'end' && audience) window.close();
+    if (e.data?.type === 'slides' && !audience) { slidesFull = e.data.full; updateBanner(); }
   };
 
   // presenter header: elapsed time, wall clock, notes size
@@ -1235,7 +1263,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
       const active = (b.dataset.m === 'presenter') === on;
       b.classList.toggle('on', active); b.setAttribute('aria-pressed', active);
     });
-    $('rehearse').textContent = on && !companion ? 'On this screen only. For a projector, set it to Extended in System Settings → Displays, then press D.' : '';
+    updateBanner();
     if (on) { startClock(); renderNext(); }
     fit(); wake();
   }
@@ -1244,10 +1272,12 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   addEventListener('beforeprint', () => slides.forEach(s => s.querySelectorAll('iframe[data-src]').forEach(f => { if (!f.src) f.src = f.dataset.src; })));
 
   addEventListener('hashchange', () => go((parseInt(location.hash.slice(1), 10) || 1) - 1, { fromHash: true }));
-  const firstVisit = !location.hash && !companion && matchMedia('(hover:hover)').matches && window.screen.isExtended;
+  const firstVisit = !location.hash && !audience && matchMedia('(hover:hover)').matches && window.screen.isExtended;
   fit();
   go((parseInt(location.hash.slice(1), 10) || 1) - 1, { fromHash: true, instant: true });
-  setPresenter(companion);
+  body.classList.toggle('audience', audience);
+  setPresenter(false);
+  fit();
   if (firstVisit) openStart();
   const ready = () => body.classList.add('ready');
   (document.fonts?.ready || Promise.resolve()).then(ready); setTimeout(ready, 1200);

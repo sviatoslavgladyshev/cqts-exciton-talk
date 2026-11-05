@@ -32,14 +32,14 @@ Click the right part of a slide to go forward and the left third to go back. On 
 Move the pointer to bring up the control bar, and hover over its timeline to preview any slide.
 The address bar keeps the slide number (`#12`), so you can link to a single slide.
 
-**Presenting with a projector:** set the projector to *Extended* in System Settings → Displays (not mirrored), open the site in
-Chrome or Edge, and press **P** or choose *Presenter* in the control bar. The first time, click *Find my projector* and allow access to your displays.
+**Presenting with a projector or second monitor:** set it to *Extended* in System Settings → Displays (not mirrored), open the site in
+Chrome or Edge, and press **P** or choose *Presenter* in the control bar. The first time, click *Find my second display* and allow access to your displays.
 
-- **Presenter:** slides full screen on the projector; notes, timer and next slide on your laptop. With one screen, the window switches to this layout in place.
+- **Presenter:** this window stays where it is and shows your notes, timer and next slide. The slides open in a new window on the other display, with no toolbar; click *Make slides full screen*, or press any key or clicker button, to fill it. With one screen, the window simply switches layout.
 - **Viewer:** just the slides. Switch back with **P** or *Viewer*, which also ends the show on the projector.
 - **D** chooses which display gets the slides, including full-screen slides with no notes.
 
-Safari and Firefox cannot move windows between displays: drag the window onto the projector first, then press **P** or **F**.
+Safari and Firefox cannot move windows between displays: choose Presenter, drag the slides window onto the projector, then click it and press **F**.
 
 **Clicker:** presentation remotes work with no setup. Forward and back send PageDown and PageUp (or media-track keys),
 the start button (F5 or Shift+F5) goes full screen instead of reloading, and the blank-screen button (`.` or B) goes black.
