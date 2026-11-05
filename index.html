@@ -121,20 +121,24 @@ body.show-start #start .sheet,body.show-remote #remote .sheet,body.show-help #he
 /* grouped list, as in System Settings */
 .group{border-radius:11px;background:#2c2c2e;overflow:hidden;margin-bottom:14px}
 .group[hidden]{display:none}
+.rowi>span:first-child{flex:none;max-width:100%}
+#picker .rowi>span:first-child{flex:1}
 .rowi{all:unset;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:14px;width:100%;min-height:42px;padding:8px 13px;font-size:14px;color:var(--ink)}
 .rowi[hidden]{display:none}
 .rowi+.rowi{box-shadow:inset 0 .5px 0 rgba(255,255,255,.1)}
 button.rowi{cursor:pointer}
 button.rowi:hover{background:rgba(255,255,255,.05)}
 button.rowi:focus-visible{outline:2px solid var(--tint);outline-offset:-2px}
-.val{color:var(--ink-2);display:flex;align-items:center;gap:7px;white-space:nowrap;min-width:0}
+.val{color:var(--ink-2);display:flex;align-items:center;gap:7px;min-width:0;text-align:right;overflow-wrap:anywhere;line-height:1.3}
 .chev::after{content:"›";margin-left:2px;color:var(--ink-3);font-size:17px;line-height:1}
 .val.ok{color:var(--ink)}
 .val.ok::before{content:"";width:7px;height:7px;border-radius:50%;background:#30d158}
-#picker{display:flex;gap:2px;padding:2px;border-radius:8px;background:rgba(255,255,255,.08);min-width:0}
-#picker button{all:unset;box-sizing:border-box;cursor:pointer;padding:4px 11px;border-radius:6px;font-size:13px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#picker button.on{background:rgba(255,255,255,.2);color:#fff}
-#picker button:focus-visible{outline:2px solid var(--tint)}
+.grouplabel{margin:0 0 6px 13px;font-size:12px;color:var(--ink-3)}
+.grouplabel[hidden]{display:none}
+#picker:empty{display:none}
+#picker .rowi span:first-child{min-width:0;overflow-wrap:anywhere;line-height:1.3}
+#picker .rowi::after{content:"";flex:none;width:16px;height:16px;background:no-repeat center/contain}
+#picker .rowi.on::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m3 8.500 3.300 3.300L13 4.500' fill='none' stroke='%230a84ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
 #sfull{all:unset;flex:none;position:relative;width:40px;height:24px;border-radius:12px;cursor:pointer;background:rgba(255,255,255,.18);transition:background .2s}
 #sfull::after{content:"";position:absolute;left:2px;top:2px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.35);transition:transform .26s var(--ease)}
 #sfull[aria-checked=true]{background:#30d158}
@@ -207,7 +211,7 @@ body.presenter #phead{display:flex;position:fixed;left:0;right:0;top:0;height:68
 #timer{all:unset;cursor:pointer;font-size:32px;font-weight:300;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
 #timer.paused{color:var(--ink-3)}
 #clock{font-size:15px;color:var(--ink-3);font-variant-numeric:tabular-nums}
-#rehearse{flex:1;min-width:0;font-size:13px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#rehearse{flex:1;min-width:0;font-size:13px;line-height:1.3;color:var(--ink-3);overflow-wrap:anywhere}
 #pfs{all:unset;flex:none;cursor:pointer;padding:6px 12px;border-radius:8px;font-size:13px;font-weight:500;color:#000;background:#f5f5f7}
 #pfs[hidden]{display:none}
 #pfs:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
@@ -766,8 +770,9 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   <div class="sheet">
     <div class="sheethead"><h2 id="starttitle">Settings</h2><button id="mskip" class="link">Done</button></div>
     <p id="dstatus"></p>
+    <p class="grouplabel" id="picklabel">Show slides on</p>
+    <div class="group" id="picker"></div>
     <div class="group">
-      <div class="rowi" id="rowpick"><span>Slides on</span><div id="picker"></div></div>
       <div class="rowi"><span>Fill the display</span><button id="sfull" role="switch" aria-checked="true" aria-label="Fill the display"></button></div>
     </div>
     <div class="group">
@@ -1087,12 +1092,14 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     const picker = $('picker'); picker.textContent = '';
     if (many) l.forEach(s => {
       const b = document.createElement('button');
-      b.textContent = screenName(s);
-      b.className = s === target ? 'on' : '';
+      const name = document.createElement('span'); name.textContent = screenName(s);
+      b.append(name);
+      b.className = 'rowi' + (s === target ? ' on' : '');
+      b.setAttribute('aria-pressed', s === target);
       b.onclick = () => { target = s; renderStart(); };
       picker.append(b);
     });
-    $('rowpick').hidden = !many;
+    $('picklabel').hidden = !many;
     $('prow').hidden = !isPresenter;
     $('allow').hidden = !ask;
     $('modes').hidden = ask;
