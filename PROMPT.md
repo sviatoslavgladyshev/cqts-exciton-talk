@@ -22,7 +22,7 @@ and anything not yet computed must stay labelled "proposed" or "schematic".
   at about 960 dpi, and size it so 1 em is about 55 px on the 1920 × 1080 canvas. Never write maths as plain text with
   underscores (for example `Omega_X`); use a LaTeX image, or words.
 - Animations are GIFs in `assets/anim-*.gif`. The live illustration on slide 3 is `embed-recreation.html`, loaded into an iframe.
-- `thumbs/<slide-id>.jpg` (480 × 270) are used by the grid and presenter view. Regenerate one when you change a slide.
+- `thumbs/<slide-id>.jpg` (960 × 540) are used by the grid and presenter view. Regenerate one when you change a slide.
 
 **Design rules**
 - Brand colours from the CQTS logo: purple `#4E057E` (eyebrows, titles' accent, buttons) and blue `#0D40A6`

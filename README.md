@@ -22,7 +22,8 @@ A self-contained HTML slide deck with its own viewer: no build step, no framewor
 | **F** | Full screen |
 | **G** | All slides, grouped by section (arrow keys and Enter work here) |
 | **N** | Speaker notes |
-| **P** | Presenter window: notes, next slide, timer and clock, kept in sync with the main window |
+| **P** | Switch between Viewer and Presenter (also the switch in the control bar) |
+| **D** | Choose a display |
 | **B** or **.** | Black screen; any key brings the slide back |
 | **?** | Keyboard shortcuts |
 | Esc | Close the grid, notes or shortcuts |
@@ -31,9 +32,18 @@ Click the right part of a slide to go forward and the left third to go back. On 
 Move the pointer to bring up the control bar, and hover over its timeline to preview any slide.
 The address bar keeps the slide number (`#12`), so you can link to a single slide.
 
+**Presenting with a projector:** set the projector to *Extended* in System Settings → Displays (not mirrored), open the site in
+Chrome or Edge, and press **P** or choose *Presenter* in the control bar. The first time, click *Find my projector* and allow access to your displays.
+
+- **Presenter:** slides full screen on the projector; notes, timer and next slide on your laptop. With one screen, the window switches to this layout in place.
+- **Viewer:** just the slides. Switch back with **P** or *Viewer*, which also ends the show on the projector.
+- **D** chooses which display gets the slides, including full-screen slides with no notes.
+
+Safari and Firefox cannot move windows between displays: drag the window onto the projector first, then press **P** or **F**.
+
 **Clicker:** presentation remotes work with no setup. Forward and back send PageDown and PageUp (or media-track keys),
 the start button (F5 or Shift+F5) goes full screen instead of reloading, and the blank-screen button (`.` or B) goes black.
-Holding a button moves one slide only. The browser window you are presenting from must have focus: click it once before you start.
+Holding a button moves one slide only. In Presenter mode the clicker works without any extra click. In other modes, click the browser window once so it has focus.
 
 **PDF:** use the browser's *Print → Save as PDF*. You get one slide per page at 1920 × 1080.
 

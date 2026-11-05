@@ -10,7 +10,8 @@
 <meta property="og:title" content="Topological excitons in biased bilayer graphene">
 <meta property="og:description" content="Research symposium talk, Center for Quantum and Topological Systems, NYU Abu Dhabi">
 <meta property="og:image" content="https://sviatoslavgladyshev.github.io/cqts-exciton-talk/thumbs/cover.jpg">
-<link rel="icon" href="assets/cqts-logo.png">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="stylesheet" href="fonts/roboto.css">
 <style>
 /* ---------- page ---------- */
@@ -71,6 +72,12 @@ body.idle #bar{opacity:0;transform:translate(-50%,14px);pointer-events:none}
 #chapter{flex:1;min-width:0;padding:0 12px;text-align:center;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sep{width:1px;height:18px;background:rgba(255,255,255,.12);margin:0 5px}
 
+/* Viewer | Presenter switch */
+#seg{display:flex;flex:none;padding:2px;margin:0 6px;border-radius:11px;background:rgba(255,255,255,.09)}
+#bar #seg button{width:auto;height:30px;padding:0 13px;border-radius:9px;font-size:13px;font-weight:500;color:var(--ink-2);display:block;line-height:30px}
+#bar #seg button:hover{background:none;color:var(--ink)}
+#bar #seg button.on{background:rgba(255,255,255,.22);color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+
 /* tooltips */
 #bar button[data-tip]::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 12px);left:50%;transform:translate(-50%,4px);padding:5px 9px;border-radius:8px;white-space:nowrap;
   background:rgba(20,20,23,.94);box-shadow:inset 0 0 0 1px var(--glass-line);color:var(--ink);font-size:12px;font-weight:500;opacity:0;pointer-events:none;transition:opacity .14s,transform .2s var(--ease)}
@@ -128,6 +135,36 @@ kbd{display:inline-block;min-width:24px;padding:3px 7px;margin-left:3px;border-r
 #black{position:fixed;inset:0;background:#000;z-index:15;opacity:0;pointer-events:none;transition:opacity .4s ease}
 body.black #black{opacity:1;pointer-events:auto}
 
+/* start sheet: choose a mode and a display */
+#start{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:16px;background:rgba(0,0,0,.5);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  opacity:0;visibility:hidden;transition:opacity .24s,visibility 0s linear .24s}
+body.show-start #start{opacity:1;visibility:visible;transition:opacity .24s,visibility 0s}
+#startcard{width:min(640px,100%);max-height:calc(100vh - 32px);overflow:auto;padding:30px;border-radius:28px;transform:scale(.96);transition:transform .45s var(--ease)}
+body.show-start #startcard{transform:none}
+#startcard h2{margin:0;font-size:26px;font-weight:700;letter-spacing:-.02em}
+#dstatus{margin:8px 0 0;font-size:14px;line-height:1.5;color:var(--ink-2)}
+#picker{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+#picker:empty{display:none}
+#picker button{all:unset;box-sizing:border-box;cursor:pointer;padding:9px 14px;border-radius:12px;font-size:14px;font-weight:500;color:var(--ink);background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1px transparent;transition:background .18s,box-shadow .18s}
+#picker button:hover{background:rgba(255,255,255,.14)}
+#picker button.on{background:rgba(167,139,250,.2);box-shadow:inset 0 0 0 1.5px var(--tint)}
+#picker button:focus-visible,#modes button:focus-visible,#allow:focus-visible,#mskip:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
+#modes{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
+#modes[hidden]{display:none}
+#modes button{all:unset;box-sizing:border-box;cursor:pointer;display:block;padding:18px;border-radius:18px;background:rgba(255,255,255,.08);transition:background .18s,transform .3s var(--ease)}
+#modes button:hover{background:rgba(255,255,255,.14);transform:translateY(-2px)}
+#modes button:active{transform:scale(.98)}
+#modes svg{display:block;width:30px;height:30px;margin-bottom:12px;fill:none;stroke:var(--ink);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#modes b{display:block;font-size:17px;font-weight:600;letter-spacing:-.01em;color:var(--ink)}
+#modes span{display:block;margin-top:4px;font-size:13px;line-height:1.4;color:var(--ink-2)}
+#allow{all:unset;box-sizing:border-box;cursor:pointer;display:block;width:100%;margin-top:20px;padding:13px;border-radius:14px;text-align:center;font-size:15px;font-weight:600;color:#fff;background:#4E057E;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+#allow:hover{background:#5f0a99}
+#allow[hidden]{display:none}
+#mskip{all:unset;cursor:pointer;display:block;margin:16px auto 0;font-size:13px;color:var(--ink-2)}
+#mskip:hover{color:var(--ink)}
+body.audience,body.audience #stage{cursor:none}
+body.audience #bar,body.audience #notes{display:none}
+
 /* ---------- presenter view ---------- */
 #phead,#pv,#pnotes{display:none}
 body.presenter{cursor:auto}
@@ -140,25 +177,28 @@ body.presenter #phead{display:flex;position:fixed;left:0;right:0;top:0;height:76
 #timer,#clock{font-size:30px;font-weight:600;letter-spacing:-.015em;font-variant-numeric:tabular-nums;line-height:1.1}
 #timer.paused{color:var(--ink-3)}
 #clock{font-weight:400;color:var(--ink-2)}
-#ptools{margin-left:auto;display:flex;gap:6px}
+#ptools{margin-left:auto;flex:none;display:flex;gap:6px}
 #ptools button{all:unset;cursor:pointer;padding:7px 13px;border-radius:10px;font-size:13px;font-weight:500;color:var(--ink);background:rgba(255,255,255,.08);transition:background .18s}
 #ptools button:hover{background:rgba(255,255,255,.16)}
 #ptools button:focus-visible{outline:2px solid var(--tint)}
 body.presenter #pv{display:block;position:fixed;right:0;top:84px;width:40%;padding:12px 28px 0 8px;color:var(--ink)}
 #nextwrap{position:relative;width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:rgba(255,255,255,.05);display:grid;place-items:center;color:var(--ink-3);font-size:15px}
-#nextimg{position:absolute;inset:0;width:100%;height:100%}
-#nextimg[hidden]{display:none}
+#nextwrap .slide{visibility:visible;opacity:1;transition:none;transform-origin:0 0;pointer-events:none}
+#nextwrap{background:#fff}
+#nextwrap.end{background:rgba(255,255,255,.05)}
+#rehearse{min-width:0;flex:1;font-size:13px;line-height:1.35;color:var(--ink-2)}
 body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;top:calc(84px + 12px + 22px + (40vw - 36px) * .5625 + 18px);overflow:auto;padding:4px 28px 24px 8px;font-size:var(--notes,22px);line-height:1.5;letter-spacing:-.005em;color:var(--ink)}
 
 /* ---------- small screens ---------- */
 @media (max-width:720px){
-  #chapter,.sep,#bar #bpres,#bar #bhelp{display:none}
+  #chapter,.sep,#seg,#bar #bpres,#bar #bhelp{display:none}
   #row{justify-content:space-between}
   #count{flex:1}
   #deck{border-radius:10px}
   #bar{bottom:calc(10px + env(safe-area-inset-bottom))}
   .tiles{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:18px 14px}
   #grid header p{display:none}
+  #modes{grid-template-columns:1fr}
 }
 @media (hover:none){#scrub:hover .ch{height:4px}#peek,#bar button[data-tip]::after{display:none}}
 
@@ -166,7 +206,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
 @page{size:1920px 1080px;margin:0}
 @media print{
   html,body{overflow:visible;background:#fff}
-  body::before,#bar,#notes,#grid,#phead,#pv,#pnotes,#help,#jump,#black,#peek{display:none!important}
+  body::before,#bar,#notes,#grid,#phead,#pv,#pnotes,#help,#jump,#black,#peek,#start,#seg{display:none!important}
   #stage{position:static}
   #deck{position:static;transform:none!important;box-shadow:none;width:auto;height:auto;overflow:visible;border-radius:0;opacity:1}
   .slide{position:relative;visibility:visible;opacity:1!important;transform:none!important;page-break-after:always;break-after:page}
@@ -667,6 +707,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
 <header id="phead">
   <div><div class="lab">Elapsed</div><div id="timer">00:00</div></div>
   <div><div class="lab">Time</div><div id="clock">--:--</div></div>
+  <div id="rehearse"></div>
   <div id="ptools">
     <button id="tpause">Pause</button>
     <button id="treset">Reset</button>
@@ -676,9 +717,23 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
 </header>
 <div id="pv">
   <div class="lab" id="nextlab">Next</div>
-  <div id="nextwrap">End of talk<img id="nextimg" alt="Next slide preview"></div>
+  <div id="nextwrap"></div>
 </div>
 <div id="pnotes"></div>
+
+<div id="start" role="dialog" aria-label="Start presenting">
+  <div id="startcard" class="glass">
+    <h2>Start presenting</h2>
+    <p id="dstatus"></p>
+    <div id="picker"></div>
+    <button id="allow" hidden>Find my projector</button>
+    <div id="modes">
+      <button id="mpres"><svg viewBox="0 0 30 30"><rect x="2.500" y="6" width="15" height="11" rx="2"/><path d="M21 9.500h6.500M21 14h6.500M21 18.500h6.500M7 22h6M10 17v5"/></svg><b>Presenter mode</b><span id="mpresd"></span></button>
+      <button id="mslides"><svg viewBox="0 0 30 30"><rect x="3.500" y="6" width="23" height="15" rx="2.500"/><path d="m12.500 10 6 3.500-6 3.500z"/><path d="M11 25h8"/></svg><b>Slides only</b><span id="mslidesd"></span></button>
+    </div>
+    <button id="mskip">Just browse the slides</button>
+  </div>
+</div>
 
 <div id="peek" class="glass"><img alt=""><div></div></div>
 <div id="jump" class="glass"></div>
@@ -693,7 +748,8 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     <dt>Jump to a slide</dt><dd><kbd>12</kbd><kbd>Return</kbd></dd>
     <dt>All slides</dt><dd><kbd>G</kbd></dd>
     <dt>Speaker notes</dt><dd><kbd>N</kbd></dd>
-    <dt>Presenter window</dt><dd><kbd>P</kbd></dd>
+    <dt>Switch Viewer / Presenter</dt><dd><kbd>P</kbd></dd>
+    <dt>Choose a display</dt><dd><kbd>D</kbd></dd>
     <dt>Black screen</dt><dd><kbd>B</kbd></dd>
     <dt>Full screen</dt><dd><kbd>F</kbd></dd>
     <dt>Close</dt><dd><kbd>Esc</kbd></dd>
@@ -708,9 +764,13 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     <span id="count"></span>
     <button id="bnext" aria-label="Next slide" data-tip="Next  →"><svg viewBox="0 0 24 24"><path d="M9.5 5.5 16 12l-6.5 6.5"/></svg></button>
     <div id="chapter"></div>
+    <div id="seg" role="group" aria-label="Mode">
+      <button data-m="viewer" data-tip="Switch mode  P">Viewer</button>
+      <button data-m="presenter" data-tip="Switch mode  P">Presenter</button>
+    </div>
     <button id="bgrid" aria-label="All slides" data-tip="All slides  G"><svg viewBox="0 0 24 24"><rect x="4" y="4.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4.5" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/></svg></button>
     <button id="bnotes" aria-label="Speaker notes" data-tip="Notes  N"><svg viewBox="0 0 24 24"><rect x="4.5" y="4" width="15" height="16" rx="3"/><path d="M8.5 9h7M8.5 12.5h7M8.5 16h4"/></svg></button>
-    <button id="bpres" aria-label="Presenter window" data-tip="Presenter  P"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="11.5" rx="2.4"/><path d="M12 16.5V20M8.5 20h7"/></svg></button>
+    <button id="bpres" aria-label="Choose a display" data-tip="Displays  D"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="11.5" rx="2.4"/><path d="M12 16.5V20M8.5 20h7"/></svg></button>
     <button id="bhelp" aria-label="Keyboard shortcuts" data-tip="Shortcuts  ?"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M9.7 9.6a2.4 2.4 0 1 1 3.7 2c-.9.6-1.4 1-1.4 2"/><path d="M12 16.6v.01"/></svg></button>
     <div class="sep"></div>
     <button id="bfull" aria-label="Full screen" data-tip="Full screen  F"><svg viewBox="0 0 24 24"><path d="M4.5 9V6.5a2 2 0 0 1 2-2H9M15 4.5h2.5a2 2 0 0 1 2 2V9M19.5 15v2.500a2 2 0 0 1-2 2H15M9 19.500H6.500a2 2 0 0 1-2-2V15"/></svg></button>
@@ -723,7 +783,8 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   const slides = [...deck.querySelectorAll('section.slide')];
   const N = slides.length;
   const $ = id => document.getElementById(id);
-  const isPresenter = new URLSearchParams(location.search).has('presenter');
+  const companion = new URLSearchParams(location.search).has('presenter');   // the notes window opened for a projector
+  let isPresenter = companion;
   const chan = 'BroadcastChannel' in window ? new BroadcastChannel('cqts-deck') : null;
   const body = document.body;
   let cur = -1, timers = [];
@@ -825,15 +886,32 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     $('scrub').setAttribute('aria-valuenow', n + 1);
     $('notes').textContent = notesOf(next) || 'No notes for this slide.';
     $('pnotes').textContent = notesOf(next);
-    const last = n + 1 >= N;
-    $('nextimg').hidden = last;
-    if (!last) $('nextimg').src = thumb(n + 1);
-    $('nextlab').textContent = last ? 'Next' : `Next · ${n + 2} of ${N}`;
+    renderNext();
     tiles.forEach((a, i) => a.classList.toggle('cur', i === n));
     if (!opts.fromHash) history.replaceState(null, '', `${location.search}#${n + 1}`);
     if (chan && !opts.remote) chan.postMessage({ type: 'go', n });
   }
   const step = d => go(cur + d);
+
+  // the next-slide preview is the real slide, scaled down, so it is as sharp as the slide itself
+  function scaleNext() {
+    const c = $('nextwrap').firstElementChild;
+    if (c) c.style.transform = `scale(${$('nextwrap').clientWidth / 1920})`;
+  }
+  function renderNext() {
+    if (!isPresenter) return;
+    const wrap = $('nextwrap'), last = cur + 1 >= N;
+    wrap.textContent = last ? 'End of talk' : '';
+    wrap.classList.toggle('end', last);
+    $('nextlab').textContent = last ? 'Next' : `Next · ${cur + 2} of ${N}`;
+    if (last) return;
+    const c = slides[cur + 1].cloneNode(true);
+    c.removeAttribute('id'); c.setAttribute('aria-hidden', 'true');
+    c.querySelectorAll('[data-build-in]').forEach(el => { el.removeAttribute('data-build-in'); el.style.opacity = ''; el.style.transform = ''; el.style.transition = ''; });
+    c.querySelectorAll('iframe[data-src]').forEach(f => { f.src = f.dataset.src; });
+    wrap.append(c); scaleNext();
+  }
+  addEventListener('resize', scaleNext);
 
   // ---------- chapter scrubber ----------
   const scrub = $('scrub'), peek = $('peek');
@@ -879,7 +957,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     tiles.forEach((a, j) => a.classList.toggle('sel', j === sel));
     tiles[sel].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   };
-  const closeOverlays = () => body.classList.remove('show-grid', 'show-help');
+  const closeOverlays = () => body.classList.remove('show-grid', 'show-help', 'show-notes');
   const toggleGrid = () => {
     body.classList.remove('show-help');
     if (body.classList.toggle('show-grid')) {
@@ -910,13 +988,137 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     bnotes: () => toggle('show-notes'),
     bhelp: () => { body.classList.remove('show-grid'); toggle('show-help'); },
     bfull: () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(),
-    bpres: () => window.open(`${location.pathname}?presenter#${cur + 1}`, 'presenter', 'width=1400,height=850')
+    bpres: () => openStart()
   };
   Object.entries(actions).forEach(([id, fn]) => { $(id).onclick = e => { fn(); e.currentTarget.blur(); }; });
   const setBlack = (on, remote) => {
     body.classList.toggle('black', on);
     if (chan && !remote) chan.postMessage({ type: 'black', on });
   };
+
+  // ---------- start sheet: modes and displays ----------
+  // A browser only reaches a second display through the Window Management API (Chrome and Edge).
+  // Without it, the window has to be dragged across by hand, and the sheet says so.
+  const canPlace = 'getScreenDetails' in window;
+  let details = null, target = null, access = canPlace ? 'prompt' : 'none', startNote = '';
+  const allScreens = () => details?.screens || [];
+  const screenName = s => s.label || (s.isInternal ? 'Built-in display' : 'External display');
+  const pickTarget = () => {
+    const l = allScreens();
+    if (l.includes(target)) return;
+    target = l.find(s => !s.isInternal && s !== details.currentScreen) || l.find(s => s !== details.currentScreen) || l[0] || null;
+  };
+  function renderStart() {
+    const l = allScreens(), many = l.length > 1;
+    const ext = !!window.screen.isExtended;
+    const ask = canPlace && !details && access === 'prompt' && ext;
+    const manual = !canPlace || access === 'denied';
+    let msg;
+    if (startNote) msg = startNote;
+    else if (many) msg = 'Choose the display for your slides.';
+    else if (ask) msg = 'A second display is connected. Allow this site to use it so the slides can go there.';
+    else if (access === 'denied') msg = 'Display access is blocked for this site. Allow “Window management” in the site settings next to the address bar, or drag this window onto the projector first.';
+    else if (!canPlace) msg = 'This browser cannot move slides to another display by itself. Drag this window onto the projector first, or use Chrome or Edge.';
+    else msg = 'Only this display is detected. If the projector shows a copy of this screen, or nothing, set it to Extended in System Settings → Displays.';
+    $('dstatus').textContent = msg;
+    const picker = $('picker'); picker.textContent = '';
+    if (many) l.forEach(s => {
+      const b = document.createElement('button');
+      b.textContent = screenName(s) + (s === details.currentScreen ? ' (this window)' : '');
+      b.className = s === target ? 'on' : '';
+      b.onclick = () => { target = s; renderStart(); };
+      picker.append(b);
+    });
+    $('allow').hidden = !ask;
+    $('modes').hidden = ask;
+    const where = many ? screenName(target) : 'this display';
+    $('mpresd').textContent = many ? `Slides on ${where}. Notes, timer and next slide on your other screen.`
+      : manual ? 'Opens your notes in a second window. Keep it on your laptop.' : 'Notes, timer and next slide on this screen.';
+    $('mslidesd').textContent = `Full-screen slides on ${where}, with no notes.`;
+  }
+  async function loadDisplays(ask) {
+    if (!canPlace) return renderStart();
+    if (!details) {
+      try { access = (await navigator.permissions.query({ name: 'window-management' })).state; } catch { access = 'prompt'; }
+      if (access === 'granted' || (access === 'prompt' && ask)) {
+        try {
+          details = await window.getScreenDetails();
+          access = 'granted';
+          details.addEventListener('screenschange', () => { pickTarget(); renderStart(); });
+        } catch { access = 'denied'; }
+      }
+    }
+    if (details) pickTarget();
+    renderStart();
+  }
+  function openStart(note = '') {
+    startNote = note;
+    closeOverlays(); body.classList.add('show-start');
+    renderStart(); loadDisplays(false);
+  }
+  const closeStart = () => { startNote = ''; body.classList.remove('show-start'); };
+  async function fullscreenOn(screen) {
+    if (document.fullscreenElement) await document.exitFullscreen();
+    await document.documentElement.requestFullscreen(screen ? { screen } : {});
+  }
+  async function startPresenter() {
+    const url = `${location.pathname}?presenter#${cur + 1}`;
+    const others = allScreens().filter(s => s !== target);
+    if (!target || !others.length) {
+      closeStart();
+      if (canPlace && access !== 'denied') return setPresenter(true);   // one display: switch in place
+      pw = window.open(url, 'presenter', 'popup,width=1400,height=850');  // the window goes to the projector by hand
+      if (!pw) openStart('The browser blocked the notes window. Allow pop-ups for this site, then try again.');
+      return;
+    }
+    const home = others.find(s => s.isInternal) || others[0];
+    closeStart();
+    try { await fullscreenOn(target); }
+    catch { return openStart('Almost there. Click Presenter mode once more to send the slides to the display.'); }
+    // the fullscreen call and this popup share one click, which needs the display permission
+    setPresenter(false);
+    pw = window.open(url, 'presenter', `popup,left=${home.availLeft},top=${home.availTop},width=${home.availWidth},height=${home.availHeight}`);
+    if (!pw) {
+      await document.exitFullscreen().catch(() => {});
+      return openStart('The browser blocked the notes window. Allow pop-ups for this site, then try again.');
+    }
+    pw.focus();
+    body.classList.add('audience');
+  }
+
+  // Viewer | Presenter: the one control for changing mode
+  let pw = null;
+  async function switchMode(to) {
+    if (to === (isPresenter ? 'presenter' : 'viewer')) return;
+    if (to === 'viewer') {
+      if (!companion) return setPresenter(false);
+      chan?.postMessage({ type: 'end' });
+      window.close();
+      setTimeout(() => location.replace(`${location.pathname}#${cur + 1}`), 150);   // for a tab the script cannot close
+      return;
+    }
+    if (canPlace && !details) await loadDisplays(false);
+    if (allScreens().length > 1) return startPresenter();
+    if (!canPlace || access === 'denied' || (window.screen.isExtended && !details)) return openStart();
+    setPresenter(true);
+  }
+  document.querySelectorAll('#seg button').forEach(b => { b.onclick = () => { switchMode(b.dataset.m); b.blur(); }; });
+  // closing the notes window ends the show on the projector too
+  setInterval(() => {
+    if (pw?.closed) { pw = null; if (body.classList.contains('audience')) document.exitFullscreen().catch(() => {}); }
+  }, 700);
+  async function startSlides() {
+    closeStart();
+    try { await fullscreenOn(target); }
+    catch { openStart('Almost there. Click Slides only once more to go full screen.'); }
+  }
+  $('mpres').onclick = startPresenter;
+  $('mslides').onclick = startSlides;
+  $('mskip').onclick = closeStart;
+  $('allow').onclick = () => loadDisplays(true);
+  $('start').addEventListener('click', e => { if (e.target === $('start')) closeStart(); });
+  window.screen.addEventListener?.('change', () => { if (body.classList.contains('show-start')) loadDisplays(false); });
+  document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement) body.classList.remove('audience'); });
 
   // typing a number then Return jumps to that slide
   const CLICKER_KEYS = ['PageDown', 'PageUp', 'MediaTrackNext', 'MediaTrackPrevious', 'F5', '.'];
@@ -931,6 +1133,15 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   addEventListener('keydown', e => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     const k = e.key;
+    if (body.classList.contains('show-start')) {
+      e.preventDefault();
+      if (e.repeat) return;
+      if (k === 'Enter' || k === 'F5') { if (!$('allow').hidden) $('allow').click(); else if (!e.target.closest?.('#start button')) startPresenter(); else e.target.click(); }
+      else if (k === ' ' && e.target.closest?.('#start button')) e.target.click();
+      else if (k === 'Tab') { e.preventDefault(); const f = [...$('start').querySelectorAll('button:not([hidden])')].filter(b => b.offsetParent); f[(f.indexOf(document.activeElement) + (e.shiftKey ? -1 : 1) + f.length) % f.length]?.focus(); }
+      else if (!['Shift', 'Meta', 'Control', 'Alt'].includes(k)) closeStart();
+      return;
+    }
     // clickers: a held button repeats its key, which must not race through the deck
     if (e.repeat && CLICKER_KEYS.includes(k)) { e.preventDefault(); return; }
     // clicker "start" button (F5 or Shift+F5): full screen rather than reloading the page
@@ -954,7 +1165,8 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     else if (k === 'f' || k === 'F') actions.bfull();
     else if (k === 'g' || k === 'G') toggleGrid();
     else if (k === 'n' || k === 'N') { if (!isPresenter) actions.bnotes(); }
-    else if (k === 'p' || k === 'P') { if (!isPresenter) actions.bpres(); }
+    else if (k === 'p' || k === 'P') switchMode(isPresenter ? 'viewer' : 'presenter');
+    else if ((k === 'd' || k === 'D') && !companion) openStart();
     else if (k === 'b' || k === 'B' || k === '.') setBlack(true);
     else if (k === '?') actions.bhelp();
     else if (k === 'Escape') { closeOverlays(); body.classList.remove('show-notes'); }
@@ -989,12 +1201,13 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   if (chan) chan.onmessage = e => {
     if (e.data?.type === 'go') go(e.data.n, { remote: true });
     if (e.data?.type === 'black') setBlack(e.data.on, true);
+    if (e.data?.type === 'end' && document.fullscreenElement) document.exitFullscreen().catch(() => {});
   };
 
   // presenter header: elapsed time, wall clock, notes size
-  if (isPresenter) {
-    body.classList.add('presenter');
-    document.title = 'Presenter · ' + document.title;
+  let clockOn = false;
+  function startClock() {
+    if (clockOn) return; clockOn = true;
     let base = Date.now(), held = null, size = 22;
     const pad = v => String(v).padStart(2, '0');
     const tick = () => {
@@ -1013,13 +1226,29 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     $('tsmall').onclick = () => font(-2);
     $('tlarge').onclick = () => font(2);
   }
+  const baseTitle = document.title;
+  function setPresenter(on) {
+    isPresenter = on;
+    body.classList.toggle('presenter', on);
+    document.title = on ? 'Presenter · ' + baseTitle : baseTitle;
+    document.querySelectorAll('#seg button').forEach(b => {
+      const active = (b.dataset.m === 'presenter') === on;
+      b.classList.toggle('on', active); b.setAttribute('aria-pressed', active);
+    });
+    $('rehearse').textContent = on && !companion ? 'On this screen only. For a projector, set it to Extended in System Settings → Displays, then press D.' : '';
+    if (on) { startClock(); renderNext(); }
+    fit(); wake();
+  }
 
   // print: load embeds and show every slide
   addEventListener('beforeprint', () => slides.forEach(s => s.querySelectorAll('iframe[data-src]').forEach(f => { if (!f.src) f.src = f.dataset.src; })));
 
   addEventListener('hashchange', () => go((parseInt(location.hash.slice(1), 10) || 1) - 1, { fromHash: true }));
+  const firstVisit = !location.hash && !companion && matchMedia('(hover:hover)').matches && window.screen.isExtended;
   fit();
   go((parseInt(location.hash.slice(1), 10) || 1) - 1, { fromHash: true, instant: true });
+  setPresenter(companion);
+  if (firstVisit) openStart();
   const ready = () => body.classList.add('ready');
   (document.fonts?.ready || Promise.resolve()).then(ready); setTimeout(ready, 1200);
 })();
