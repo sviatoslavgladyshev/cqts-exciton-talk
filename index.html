@@ -160,17 +160,20 @@ body.show-start #startcard{transform:none}
 #allow{all:unset;box-sizing:border-box;cursor:pointer;display:block;width:100%;margin-top:20px;padding:13px;border-radius:14px;text-align:center;font-size:15px;font-weight:600;color:#fff;background:#4E057E;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
 #allow:hover{background:#5f0a99}
 #allow[hidden]{display:none}
-#mskip{all:unset;cursor:pointer;display:block;margin:16px auto 0;font-size:13px;color:var(--ink-2)}
-#mskip:hover{color:var(--ink)}
+#startfoot{display:flex;justify-content:space-between;gap:16px;margin-top:18px}
+#mskip,#mreset{all:unset;cursor:pointer;font-size:13px;color:var(--ink-2)}
+#mskip:hover,#mreset:hover{color:var(--ink)}
+#mreset:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
 body.audience,body.audience #stage{cursor:none;background:#000}
 body.audience::before,body.audience #bar,body.audience #notes,body.audience #jump,body.audience #peek{display:none}
 
 /* ---------- presenter view ---------- */
 #phead,#pv,#pnotes{display:none}
 body.presenter{cursor:auto}
+body.presenter .slide,body.presenter .slide.active{transition:none!important}
 body.presenter #stage{right:40%;top:84px;bottom:112px}
 body.presenter #bar{left:30%;width:min(calc(60vw - 32px),640px);bottom:16px}
-body.presenter #bnotes,body.presenter #bpres,body.presenter #notes{display:none}
+body.presenter #bnotes,body.presenter #notes{display:none}
 body.presenter #chapter{visibility:hidden}
 body.presenter #phead{display:flex;position:fixed;left:0;right:0;top:0;height:76px;align-items:center;gap:34px;padding:0 28px;color:var(--ink);box-shadow:inset 0 -1px 0 rgba(255,255,255,.08)}
 #phead .lab,#pv .lab{font-size:12px;font-weight:500;color:var(--ink-3);margin-bottom:2px}
@@ -712,6 +715,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   <div id="rehearse"></div>
   <div id="ptools">
     <button id="pfs" hidden>Make slides full screen</button>
+    <button id="pdisp">Displays</button>
     <button id="tpause">Pause</button>
     <button id="treset">Reset</button>
     <button id="tsmall" aria-label="Smaller notes">A−</button>
@@ -726,7 +730,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
 
 <div id="start" role="dialog" aria-label="Start presenting">
   <div id="startcard" class="glass">
-    <h2>Start presenting</h2>
+    <h2 id="starttitle">Start presenting</h2>
     <p id="dstatus"></p>
     <div id="picker"></div>
     <button id="allow" hidden>Find my second display</button>
@@ -734,7 +738,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
       <button id="mpres"><svg viewBox="0 0 30 30"><rect x="2.500" y="6" width="15" height="11" rx="2"/><path d="M21 9.500h6.500M21 14h6.500M21 18.500h6.500M7 22h6M10 17v5"/></svg><b>Presenter mode</b><span id="mpresd"></span></button>
       <button id="mslides"><svg viewBox="0 0 30 30"><rect x="3.500" y="6" width="23" height="15" rx="2.500"/><path d="m12.500 10 6 3.500-6 3.500z"/><path d="M11 25h8"/></svg><b>Slides only</b><span id="mslidesd"></span></button>
     </div>
-    <button id="mskip">Just browse the slides</button>
+    <div id="startfoot"><button id="mskip">Just browse the slides</button><button id="mreset">Reset displays</button></div>
   </div>
 </div>
 
@@ -787,16 +791,20 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   const N = slides.length;
   const $ = id => document.getElementById(id);
   const audience = new URLSearchParams(location.search).has('slides');   // the window shown on the projector
+  const slidesId = new URLSearchParams(location.search).get('slides');
   let isPresenter = false;
   const chan = 'BroadcastChannel' in window ? new BroadcastChannel('cqts-deck') : null;
   const body = document.body;
-  let cur = -1, timers = [];
+  let cur = -1;
 
   // check-circle icon used on result cards
   document.querySelectorAll('x-icon').forEach(el => {
     const s = el.getAttribute('style') || '';
     el.outerHTML = `<svg viewBox="0 0 24 24" style="${s};flex:none" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7.5 12.5l3 3 6-6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   });
+
+  // paint images only once decoded, so large figures never flash blank
+  deck.querySelectorAll('img').forEach(i => { i.decoding = 'sync'; });
 
   const notesOf = s => (s.querySelector('aside')?.textContent || '').trim();
   const thumb = i => `thumbs/${slides[i].id}.jpg`;
@@ -831,19 +839,21 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
       el.style.transform = kind === 'pop' ? 'scale(.85)' : kind === 'rise' ? 'translateY(28px)' : 'none';
     });
   }
+  // Delays are CSS, not timers: browsers throttle timers in background windows, which left content hidden.
+  // The presenter view always shows the whole slide at once.
   function playBuilds(s) {
+    s.offsetWidth;
     s.querySelectorAll('[data-build-in]').forEach(el => {
-      const order = parseInt(el.dataset.buildIn.split(/\s+/)[1] || '1', 10);
-      timers.push(setTimeout(() => {
-        el.style.transition = 'opacity .5s ease, transform .65s cubic-bezier(.34,1.45,.64,1)';
-        el.style.opacity = 1; el.style.transform = 'none';
-      }, 300 + order * 380));
+      const order = parseInt(el.dataset.buildIn.split(/\s+/)[1] || '1', 10), d = 300 + order * 380;
+      el.style.transition = isPresenter ? 'none' : `opacity .5s ease ${d}ms, transform .65s cubic-bezier(.34,1.45,.64,1) ${d}ms`;
+      el.style.opacity = 1; el.style.transform = 'none';
     });
   }
 
   // ---------- media: restart GIFs and live embeds on entry ----------
   function wakeMedia(s) {
-    s.querySelectorAll('img[src$=".gif"]').forEach(img => { const u = img.getAttribute('src'); img.src = ''; img.src = u; });
+    // a new fragment restarts a GIF while its last frame stays on screen; the presenter view leaves them running
+    if (!isPresenter) s.querySelectorAll('img[src*=".gif"]').forEach(img => { img.src = `${img.getAttribute('src').split('#')[0]}#${Date.now()}`; });
     s.querySelectorAll('iframe[data-src]').forEach(f => { f.src = f.dataset.src; });
   }
 
@@ -851,13 +861,12 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   function go(n, opts = {}) {
     n = Math.max(0, Math.min(N - 1, n));
     if (n === cur) return;
-    timers.forEach(clearTimeout); timers = [];
     const prev = cur >= 0 ? slides[cur] : null, next = slides[n];
     const fwd = n > cur;
     const kind = (fwd ? prev?.dataset.transition : next.dataset.transition) || 'fade';
     const leap = Math.abs(n - cur) > 1;       // jumps from the grid or scrubber always cross-fade
     resetBuilds(next);
-    if (prev && kind === 'push' && !opts.instant && !leap) {
+    if (prev && kind === 'push' && !opts.instant && !leap && !isPresenter) {
       next.style.transition = 'none';
       next.style.transform = `translateX(${fwd ? 100 : -100}%)`;
       next.classList.add('active'); next.offsetWidth;
@@ -865,7 +874,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
       prev.style.transform = `translateX(${fwd ? -100 : 100}%)`;
     } else {
       next.style.transform = '';
-      if (prev && kind === 'magic' && !leap) {
+      if (prev && kind === 'magic' && !leap && !isPresenter) {
         prev.style.transition = 'opacity .3s, visibility 0s linear .3s';
         next.style.transition = 'opacity .3s, visibility 0s';
       }
@@ -1032,6 +1041,8 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
       b.onclick = () => { target = s; renderStart(); };
       picker.append(b);
     });
+    $('starttitle').textContent = isPresenter ? 'Change displays' : 'Start presenting';
+    $('mskip').textContent = isPresenter ? 'Keep the current setup' : 'Just browse the slides';
     $('allow').hidden = !ask;
     $('modes').hidden = ask;
     const where = many ? screenName(target) : 'this display';
@@ -1069,12 +1080,14 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   // window on the projector. The presenter view can therefore never leave the laptop.
   let pw = null, slidesFull = false, slidesOn = '';
   async function startPresenter() {
-    const url = `${location.pathname}?slides#${cur + 1}`;
+    const id = String(Date.now());
+    const url = `${location.pathname}?slides=${id}#${cur + 1}`;
     const others = allScreens().filter(s => s !== target);
     if (!target || !others.length) {
       closeStart();
       if (canPlace && access !== 'denied') return setPresenter(true);        // one display: switch in place
-      pw = window.open(url, 'slides', 'popup,width=1280,height=720');         // moved to the projector by hand
+      stopSlides(id);
+      pw = window.open(url, `slides${id}`, 'popup,width=1280,height=720');    // moved to the other display by hand
       if (!pw) return openStart('The browser blocked the slides window. Allow pop-ups for this site, then try again.');
       slidesOn = '';
       return setPresenter(true);
@@ -1082,12 +1095,26 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     if (target === details.currentScreen)
       return openStart(`This window is on ${screenName(target)}. Drag it to ${screenName(others[0])}, then choose Presenter mode again.`);
     closeStart();
-    pw = window.open(url, 'slides', `popup,fullscreen,left=${target.availLeft},top=${target.availTop},width=${target.availWidth},height=${target.availHeight}`);
+    stopSlides(id);
+    pw = window.open(url, `slides${id}`, `popup,fullscreen,left=${target.availLeft},top=${target.availTop},width=${target.availWidth},height=${target.availHeight}`);
     if (!pw) return openStart('The browser blocked the slides window. Allow pop-ups for this site, then try again.');
     slidesOn = screenName(target); slidesFull = false;
     window.focus();
     setPresenter(true);
   }
+  // closes any slides window, including one left over from before a page reload
+  function stopSlides(keep) {
+    chan?.postMessage({ type: 'end', keep });
+    pw?.close(); pw = null; slidesFull = false;
+  }
+  async function resetDisplays() {
+    stopSlides();
+    setPresenter(false);
+    details = null; target = null;
+    await loadDisplays(false);
+    openStart('Displays reset. Choose where the slides go.');
+  }
+
   // A new window cannot go full screen by itself. A click or key press here lends it permission.
   function fullscreenSlides() {
     if (!pw || pw.closed || slidesFull) return;
@@ -1107,8 +1134,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   async function switchMode(to) {
     if (to === (isPresenter ? 'presenter' : 'viewer')) return;
     if (to === 'viewer') {
-      chan?.postMessage({ type: 'end' });
-      pw?.close(); pw = null;
+      stopSlides();
       return setPresenter(false);
     }
     if (canPlace && !details) await loadDisplays(false);
@@ -1136,12 +1162,15 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
 
   async function startSlides() {
     closeStart();
+    stopSlides(); setPresenter(false);
     try { await fullscreenOn(target); }
     catch { openStart('Almost there. Click Slides only once more to go full screen.'); }
   }
   $('mpres').onclick = startPresenter;
   $('mslides').onclick = startSlides;
   $('mskip').onclick = closeStart;
+  $('mreset').onclick = resetDisplays;
+  $('pdisp').onclick = () => openStart();
   $('allow').onclick = () => loadDisplays(true);
   $('start').addEventListener('click', e => { if (e.target === $('start')) closeStart(); });
   window.screen.addEventListener?.('change', () => { if (body.classList.contains('show-start')) loadDisplays(false); });
@@ -1228,7 +1257,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   if (chan) chan.onmessage = e => {
     if (e.data?.type === 'go') go(e.data.n, { remote: true });
     if (e.data?.type === 'black') setBlack(e.data.on, true);
-    if (e.data?.type === 'end' && audience) window.close();
+    if (e.data?.type === 'end' && audience && e.data.keep !== slidesId) window.close();
     if (e.data?.type === 'slides' && !audience) { slidesFull = e.data.full; updateBanner(); }
   };
 
@@ -1264,7 +1293,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
       b.classList.toggle('on', active); b.setAttribute('aria-pressed', active);
     });
     updateBanner();
-    if (on) { startClock(); renderNext(); }
+    if (on) { startClock(); renderNext(); playBuilds(slides[cur]); }
     fit(); wake();
   }
 

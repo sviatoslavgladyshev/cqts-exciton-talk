@@ -23,7 +23,7 @@ A self-contained HTML slide deck with its own viewer: no build step, no framewor
 | **G** | All slides, grouped by section (arrow keys and Enter work here) |
 | **N** | Speaker notes |
 | **P** | Switch between Viewer and Presenter (also the switch in the control bar) |
-| **D** | Choose a display |
+| **D** | Choose a display, or reset the displays |
 | **B** or **.** | Black screen; any key brings the slide back |
 | **?** | Keyboard shortcuts |
 | Esc | Close the grid, notes or shortcuts |
@@ -37,7 +37,7 @@ Chrome or Edge, and press **P** or choose *Presenter* in the control bar. The fi
 
 - **Presenter:** this window stays where it is and shows your notes, timer and next slide. The slides open in a new window on the other display, with no toolbar; click *Make slides full screen*, or press any key or clicker button, to fill it. With one screen, the window simply switches layout.
 - **Viewer:** just the slides. Switch back with **P** or *Viewer*, which also ends the show on the projector.
-- **D** chooses which display gets the slides, including full-screen slides with no notes.
+- **D** or the *Displays* button changes which display gets the slides at any time, even mid-talk. *Reset displays* closes the slides window and detects the screens again, with no need to reload the page.
 
 Safari and Firefox cannot move windows between displays: choose Presenter, drag the slides window onto the projector, then click it and press **F**.
 
