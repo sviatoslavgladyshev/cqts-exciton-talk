@@ -135,6 +135,21 @@ kbd{display:inline-block;min-width:24px;padding:3px 7px;margin-left:3px;border-r
 #black{position:fixed;inset:0;background:#000;z-index:15;opacity:0;pointer-events:none;transition:opacity .4s ease}
 body.black #black{opacity:1;pointer-events:auto}
 
+/* phone remote */
+#remote{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:16px;background:rgba(0,0,0,.5);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);opacity:0;visibility:hidden;transition:opacity .24s,visibility 0s linear .24s}
+body.show-remote #remote{opacity:1;visibility:visible;transition:opacity .24s,visibility 0s}
+#remotecard{display:grid;grid-template-columns:240px 1fr;gap:26px;align-items:center;width:min(680px,100%);padding:28px;border-radius:28px}
+#rqr{background:#fff;padding:16px;border-radius:18px;aspect-ratio:1;display:grid;place-items:center;color:#202124;font-size:13px}
+#rqr svg{width:100%;height:100%;display:block}
+#remotecard h2{margin:0 0 8px;font-size:24px;font-weight:700;letter-spacing:-.02em}
+#remotecard p{margin:0 0 10px;font-size:14px;line-height:1.45;color:var(--ink-2)}
+#rstatus{color:var(--ink)!important;font-weight:500}
+#rlink{color:var(--tint)}
+#rbtns{display:flex;gap:8px;margin-top:6px}
+#rbtns button{all:unset;cursor:pointer;padding:8px 14px;border-radius:10px;font-size:13px;font-weight:500;color:var(--ink);background:rgba(255,255,255,.1)}
+#rbtns button:hover{background:rgba(255,255,255,.17)}
+#rbtns button:focus-visible{outline:2px solid var(--tint)}
+
 /* start sheet: choose a mode and a display */
 #start{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:16px;background:rgba(0,0,0,.5);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
   opacity:0;visibility:hidden;transition:opacity .24s,visibility 0s linear .24s}
@@ -151,7 +166,7 @@ body.show-start #startcard{transform:none}
 #picker button:focus-visible,#modes button:focus-visible,#allow:focus-visible,#mskip:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
 #modes{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
 #modes[hidden]{display:none}
-#modes button{all:unset;box-sizing:border-box;cursor:pointer;display:block;padding:18px;border-radius:18px;background:rgba(255,255,255,.08);transition:background .18s,transform .3s var(--ease)}
+#modes button{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;justify-content:flex-start;padding:18px;border-radius:18px;background:rgba(255,255,255,.08);transition:background .18s,transform .3s var(--ease)}
 #modes button:hover{background:rgba(255,255,255,.14);transform:translateY(-2px)}
 #modes button:active{transform:scale(.98)}
 #modes svg{display:block;width:30px;height:30px;margin-bottom:12px;fill:none;stroke:var(--ink);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
@@ -160,6 +175,14 @@ body.show-start #startcard{transform:none}
 #allow{all:unset;box-sizing:border-box;cursor:pointer;display:block;width:100%;margin-top:20px;padding:13px;border-radius:14px;text-align:center;font-size:15px;font-weight:600;color:#fff;background:#4E057E;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
 #allow:hover{background:#5f0a99}
 #allow[hidden]{display:none}
+#setrow{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:16px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.06)}
+#setrow b{display:block;font-size:14px;font-weight:600}
+#setrow span{display:block;margin-top:2px;font-size:12.5px;color:var(--ink-2)}
+#sfull{all:unset;flex:none;position:relative;width:46px;height:28px;border-radius:14px;cursor:pointer;background:rgba(255,255,255,.2);transition:background .22s}
+#sfull::after{content:"";position:absolute;left:2px;top:2px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.4);transition:transform .28s var(--ease)}
+#sfull[aria-checked=true]{background:#30d158}
+#sfull[aria-checked=true]::after{transform:translateX(18px)}
+#sfull:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
 #startfoot{display:flex;justify-content:space-between;gap:16px;margin-top:18px}
 #mskip,#mreset{all:unset;cursor:pointer;font-size:13px;color:var(--ink-2)}
 #mskip:hover,#mreset:hover{color:var(--ink)}
@@ -196,7 +219,8 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
 
 /* ---------- small screens ---------- */
 @media (max-width:720px){
-  #chapter,.sep,#seg,#bar #bpres,#bar #bhelp{display:none}
+  #chapter,.sep,#seg,#bar #bpres,#bar #bhelp,#bar #bremote{display:none}
+  #remotecard{grid-template-columns:1fr}
   #row{justify-content:space-between}
   #count{flex:1}
   #deck{border-radius:10px}
@@ -211,7 +235,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
 @page{size:1920px 1080px;margin:0}
 @media print{
   html,body{overflow:visible;background:#fff}
-  body::before,#bar,#notes,#grid,#phead,#pv,#pnotes,#help,#jump,#black,#peek,#start,#seg{display:none!important}
+  body::before,#bar,#notes,#grid,#phead,#pv,#pnotes,#help,#jump,#black,#peek,#start,#seg,#remote{display:none!important}
   #stage{position:static}
   #deck{position:static;transform:none!important;box-shadow:none;width:auto;height:auto;overflow:visible;border-radius:0;opacity:1}
   .slide{position:relative;visibility:visible;opacity:1!important;transform:none!important;page-break-after:always;break-after:page}
@@ -715,7 +739,8 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   <div id="rehearse"></div>
   <div id="ptools">
     <button id="pfs" hidden>Make slides full screen</button>
-    <button id="pdisp">Displays</button>
+    <button id="pdisp">Settings</button>
+    <button id="premote">Remote</button>
     <button id="tpause">Pause</button>
     <button id="treset">Reset</button>
     <button id="tsmall" aria-label="Smaller notes">A−</button>
@@ -738,7 +763,21 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
       <button id="mpres"><svg viewBox="0 0 30 30"><rect x="2.500" y="6" width="15" height="11" rx="2"/><path d="M21 9.500h6.500M21 14h6.500M21 18.500h6.500M7 22h6M10 17v5"/></svg><b>Presenter mode</b><span id="mpresd"></span></button>
       <button id="mslides"><svg viewBox="0 0 30 30"><rect x="3.500" y="6" width="23" height="15" rx="2.500"/><path d="m12.500 10 6 3.500-6 3.500z"/><path d="M11 25h8"/></svg><b>Slides only</b><span id="mslidesd"></span></button>
     </div>
+    <div id="setrow"><div><b>Full screen on the slides display</b><span>Slides fill the display at your first click, key or clicker press.</span></div><button id="sfull" role="switch" aria-checked="true" aria-label="Full screen on the slides display"></button></div>
     <div id="startfoot"><button id="mskip">Just browse the slides</button><button id="mreset">Reset displays</button></div>
+  </div>
+</div>
+
+<div id="remote" role="dialog" aria-label="Phone remote">
+  <div id="remotecard" class="glass">
+    <div id="rqr"></div>
+    <div>
+      <h2>Phone or tablet remote</h2>
+      <p>Scan with your camera. It works on Wi-Fi or mobile data, with no app to install.</p>
+      <p id="rstatus">Connecting…</p>
+      <p>Apple Watch setup is on the phone page. <a id="rlink" target="_blank" rel="noopener">Open remote here</a></p>
+      <div id="rbtns"><button id="rclose">Done</button><button id="rnew">New code</button><button id="roff">Turn off</button></div>
+    </div>
   </div>
 </div>
 
@@ -756,7 +795,8 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     <dt>All slides</dt><dd><kbd>G</kbd></dd>
     <dt>Speaker notes</dt><dd><kbd>N</kbd></dd>
     <dt>Switch Viewer / Presenter</dt><dd><kbd>P</kbd></dd>
-    <dt>Choose a display</dt><dd><kbd>D</kbd></dd>
+    <dt>Displays and settings</dt><dd><kbd>D</kbd></dd>
+    <dt>Phone or tablet remote</dt><dd><kbd>R</kbd></dd>
     <dt>Black screen</dt><dd><kbd>B</kbd></dd>
     <dt>Full screen</dt><dd><kbd>F</kbd></dd>
     <dt>Close</dt><dd><kbd>Esc</kbd></dd>
@@ -777,7 +817,8 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     </div>
     <button id="bgrid" aria-label="All slides" data-tip="All slides  G"><svg viewBox="0 0 24 24"><rect x="4" y="4.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4.5" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/></svg></button>
     <button id="bnotes" aria-label="Speaker notes" data-tip="Notes  N"><svg viewBox="0 0 24 24"><rect x="4.5" y="4" width="15" height="16" rx="3"/><path d="M8.5 9h7M8.5 12.5h7M8.5 16h4"/></svg></button>
-    <button id="bpres" aria-label="Choose a display" data-tip="Displays  D"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="11.5" rx="2.4"/><path d="M12 16.5V20M8.5 20h7"/></svg></button>
+    <button id="bpres" aria-label="Displays and settings" data-tip="Settings  D"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="11.5" rx="2.4"/><path d="M12 16.5V20M8.5 20h7"/></svg></button>
+    <button id="bremote" aria-label="Phone remote" data-tip="Phone remote  R"><svg viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2.400"/><path d="M11 17.800h2"/></svg></button>
     <button id="bhelp" aria-label="Keyboard shortcuts" data-tip="Shortcuts  ?"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M9.7 9.6a2.4 2.4 0 1 1 3.7 2c-.9.6-1.4 1-1.4 2"/><path d="M12 16.6v.01"/></svg></button>
     <div class="sep"></div>
     <button id="bfull" aria-label="Full screen" data-tip="Full screen  F"><svg viewBox="0 0 24 24"><path d="M4.5 9V6.5a2 2 0 0 1 2-2H9M15 4.5h2.5a2 2 0 0 1 2 2V9M19.5 15v2.500a2 2 0 0 1-2 2H15M9 19.500H6.500a2 2 0 0 1-2-2V15"/></svg></button>
@@ -902,6 +943,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     tiles.forEach((a, i) => a.classList.toggle('cur', i === n));
     if (!opts.fromHash) history.replaceState(null, '', `${location.search}#${n + 1}`);
     if (chan && !opts.remote) chan.postMessage({ type: 'go', n });
+    if (remoteSeen && !opts.fromRemote) { clearTimeout(atTimer); atTimer = setTimeout(sayWhere, 400); }
   }
   const step = d => go(cur + d);
 
@@ -1078,7 +1120,9 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   }
   // Presenter: this window stays put and becomes the presenter view; the slides open as a new
   // window on the projector. The presenter view can therefore never leave the laptop.
-  let pw = null, slidesFull = false, slidesOn = '';
+  let pw = null, slidesFull = false, slidesOn = '', firstPressUsed = false;
+  let autoFull = localStorage.getItem('cqts-autofull') !== '0';
+  const NEXT_KEYS = ['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter', 'MediaTrackNext'];
   async function startPresenter() {
     const id = String(Date.now());
     const url = `${location.pathname}?slides=${id}#${cur + 1}`;
@@ -1098,7 +1142,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     stopSlides(id);
     pw = window.open(url, `slides${id}`, `popup,fullscreen,left=${target.availLeft},top=${target.availTop},width=${target.availWidth},height=${target.availHeight}`);
     if (!pw) return openStart('The browser blocked the slides window. Allow pop-ups for this site, then try again.');
-    slidesOn = screenName(target); slidesFull = false;
+    slidesOn = screenName(target); slidesFull = false; firstPressUsed = false;
     window.focus();
     setPresenter(true);
   }
@@ -1125,7 +1169,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     $('pfs').hidden = !(live && slidesOn && !slidesFull);
     $('rehearse').textContent = !isPresenter ? ''
       : live && slidesFull ? `Slides are full screen on ${slidesOn || 'the other display'}.`
-      : live && slidesOn ? `Slides are on ${slidesOn}.`
+      : live && slidesOn ? `Slides are on ${slidesOn}.${autoFull ? ' Click or press any key to fill the screen.' : ''}`
       : live ? 'Drag the slides window onto the other display, then click it and press F.'
       : 'On this screen only. To use a second display, set it to Extended in System Settings → Displays, then press D.';
   }
@@ -1144,8 +1188,20 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   }
   document.querySelectorAll('#seg button').forEach(b => { b.onclick = () => { switchMode(b.dataset.m); b.blur(); }; });
   $('pfs').onclick = fullscreenSlides;
-  addEventListener('keydown', e => { if (e.key !== 'Escape') fullscreenSlides(); }, true);
-  addEventListener('pointerdown', fullscreenSlides, true);
+  // With the setting on, the first key or clicker press fills the display and does not also change slide.
+  addEventListener('keydown', e => {
+    if (!autoFull || e.key === 'Escape' || !pw || pw.closed || !slidesOn || slidesFull) return;
+    fullscreenSlides();
+    if (!firstPressUsed && NEXT_KEYS.includes(e.key)) { firstPressUsed = true; e.preventDefault(); e.stopImmediatePropagation(); }
+  }, true);
+  addEventListener('pointerdown', () => { if (autoFull) fullscreenSlides(); }, true);
+  function setAutoFull(on) {
+    autoFull = on;
+    localStorage.setItem('cqts-autofull', on ? '1' : '0');
+    $('sfull').setAttribute('aria-checked', on);
+  }
+  $('sfull').onclick = () => setAutoFull(!autoFull);
+  setAutoFull(autoFull);
   setInterval(() => { if (pw?.closed) { pw = null; updateBanner(); } }, 700);
 
   // the slides window
@@ -1155,7 +1211,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
       if (e.origin === location.origin && e.data === 'fullscreen') document.documentElement.requestFullscreen().catch(() => {});
     });
     document.addEventListener('fullscreenchange', report);
-    const goFull = () => { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {}); };
+    const goFull = () => { if (localStorage.getItem('cqts-autofull') !== '0' && !document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {}); };
     addEventListener('keydown', goFull); addEventListener('pointerdown', goFull);
     report();
   }
@@ -1175,6 +1231,75 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   $('start').addEventListener('click', e => { if (e.target === $('start')) closeStart(); });
   window.screen.addEventListener?.('change', () => { if (body.classList.contains('show-start')) loadDisplays(false); });
 
+  // ---------- phone, tablet and watch remote ----------
+  // The site is static, so phone and computer talk through a public relay, on a private random channel.
+  // It connects only after the remote is switched on here, and carries only commands such as "next".
+  const RELAY = 'https://ntfy.sh/';
+  let room = localStorage.getItem('cqts-room'), relay = null, remoteSeen = false, atTimer;
+  const heard = new Set();
+  const newRoom = () => 'cqts-' + [...crypto.getRandomValues(new Uint8Array(16))].map(b => b.toString(16).padStart(2, '0')).join('');
+  const say = m => fetch(`${RELAY}${room}?cache=no`, { method: 'POST', body: m }).catch(() => {});
+  const sayWhere = () => say(`at:${cur}:${body.classList.contains('black') ? 1 : 0}`);
+  const remoteStatus = t => { $('rstatus').textContent = t; };
+  function connectRemote() {
+    if (relay || audience) return;
+    relay = new EventSource(`${RELAY}${room}/sse`);
+    relay.onopen = () => { remoteStatus(remoteSeen ? 'Remote connected.' : 'Ready. Waiting for your phone or tablet.'); say('hi'); };
+    relay.onerror = () => remoteStatus('Reconnecting to the relay…');
+    relay.onmessage = e => {
+      let d; try { d = JSON.parse(e.data); } catch { return; }
+      if (d.event !== 'message' || heard.has(d.id)) return;
+      heard.add(d.id);
+      const cmd = String(d.message).split('~')[0];
+      if (cmd === 'next') go(cur + 1, { fromRemote: true });
+      else if (cmd === 'prev') go(cur - 1, { fromRemote: true });
+      else if (cmd === 'first') go(0, { fromRemote: true });
+      else if (cmd === 'black') setBlack(!body.classList.contains('black'));
+      else if (cmd === 'hello') {
+        if (!remoteSeen) { remoteSeen = true; flash('Remote connected'); }
+        remoteStatus('Remote connected.');
+        sayWhere();
+      }
+    };
+  }
+  let flashT;
+  function flash(text) {
+    $('jump').textContent = text; $('jump').classList.add('on');
+    clearTimeout(flashT); flashT = setTimeout(() => $('jump').classList.remove('on'), 2500);
+  }
+  function loadQR() {
+    return window.qrcode ? Promise.resolve() : new Promise((ok, no) => {
+      const s = document.createElement('script'); s.src = 'assets/qrcode.js'; s.onload = ok; s.onerror = no; document.head.append(s);
+    });
+  }
+  async function drawQR() {
+    const url = `${location.origin}${location.pathname.replace(/[^/]*$/, '')}remote.html#${room}`;
+    $('rlink').href = url;
+    try {
+      await loadQR();
+      const q = window.qrcode(0, 'M'); q.addData(url); q.make();
+      $('rqr').innerHTML = q.createSvgTag({ cellSize: 6, margin: 0, scalable: true });
+    } catch { $('rqr').textContent = 'QR code unavailable'; }
+  }
+  function openRemote() {
+    closeOverlays(); body.classList.remove('show-start');
+    if (!room) { room = newRoom(); localStorage.setItem('cqts-room', room); }
+    localStorage.setItem('cqts-remote-on', '1');
+    body.classList.add('show-remote');
+    connectRemote(); drawQR();
+  }
+  $('bremote').onclick = openRemote;
+  $('premote').onclick = openRemote;
+  $('rclose').onclick = () => body.classList.remove('show-remote');
+  $('remote').addEventListener('click', e => { if (e.target === $('remote')) body.classList.remove('show-remote'); });
+  $('roff').onclick = () => { relay?.close(); relay = null; remoteSeen = false; localStorage.removeItem('cqts-remote-on'); body.classList.remove('show-remote'); };
+  $('rnew').onclick = () => {
+    relay?.close(); relay = null; remoteSeen = false;
+    room = newRoom(); localStorage.setItem('cqts-room', room);
+    remoteStatus('New code ready. Scan it to connect.');
+    connectRemote(); drawQR();
+  };
+
   // typing a number then Return jumps to that slide
   const CLICKER_KEYS = ['PageDown', 'PageUp', 'MediaTrackNext', 'MediaTrackPrevious', 'F5', '.'];
   let typed = '', typedT;
@@ -1188,7 +1313,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   addEventListener('keydown', e => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     const k = e.key;
-    if (audience && /^[pdngPDNG?]$/.test(k)) return;      // the slides window only moves slides
+    if (audience && /^[pdngrPDNGR?]$/.test(k)) return;      // the slides window only moves slides
     if (body.classList.contains('show-start')) {
       e.preventDefault();
       if (e.repeat) return;
@@ -1223,9 +1348,10 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     else if (k === 'n' || k === 'N') { if (!isPresenter) actions.bnotes(); }
     else if (k === 'p' || k === 'P') switchMode(isPresenter ? 'viewer' : 'presenter');
     else if (k === 'd' || k === 'D') openStart();
+    else if (k === 'r' || k === 'R') openRemote();
     else if (k === 'b' || k === 'B' || k === '.') setBlack(true);
     else if (k === '?') actions.bhelp();
-    else if (k === 'Escape') { closeOverlays(); body.classList.remove('show-notes'); }
+    else if (k === 'Escape') { closeOverlays(); body.classList.remove('show-remote'); }
   });
 
   // click the right of a slide to advance, the left third to go back
@@ -1258,7 +1384,10 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
     if (e.data?.type === 'go') go(e.data.n, { remote: true });
     if (e.data?.type === 'black') setBlack(e.data.on, true);
     if (e.data?.type === 'end' && audience && e.data.keep !== slidesId) window.close();
-    if (e.data?.type === 'slides' && !audience) { slidesFull = e.data.full; updateBanner(); }
+    if (e.data?.type === 'slides' && !audience) {
+      slidesFull = e.data.full; updateBanner();
+      if (!slidesFull && autoFull) fullscreenSlides();   // works while the click that opened the window still counts
+    }
   };
 
   // presenter header: elapsed time, wall clock, notes size
@@ -1305,6 +1434,7 @@ body.presenter #pnotes{display:block;position:fixed;right:0;bottom:0;width:40%;t
   fit();
   go((parseInt(location.hash.slice(1), 10) || 1) - 1, { fromHash: true, instant: true });
   body.classList.toggle('audience', audience);
+  if (!audience && room && localStorage.getItem('cqts-remote-on')) connectRemote();
   setPresenter(false);
   fit();
   if (firstVisit) openStart();

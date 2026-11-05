@@ -23,7 +23,8 @@ A self-contained HTML slide deck with its own viewer: no build step, no framewor
 | **G** | All slides, grouped by section (arrow keys and Enter work here) |
 | **N** | Speaker notes |
 | **P** | Switch between Viewer and Presenter (also the switch in the control bar) |
-| **D** | Choose a display, or reset the displays |
+| **D** | Settings: choose a display, reset the displays, turn automatic full screen on or off |
+| **R** | Phone or tablet remote: scan the QR code |
 | **B** or **.** | Black screen; any key brings the slide back |
 | **?** | Keyboard shortcuts |
 | Esc | Close the grid, notes or shortcuts |
@@ -35,11 +36,17 @@ The address bar keeps the slide number (`#12`), so you can link to a single slid
 **Presenting with a projector or second monitor:** set it to *Extended* in System Settings → Displays (not mirrored), open the site in
 Chrome or Edge, and press **P** or choose *Presenter* in the control bar. The first time, click *Find my second display* and allow access to your displays.
 
-- **Presenter:** this window stays where it is and shows your notes, timer and next slide. The slides open in a new window on the other display, with no toolbar; click *Make slides full screen*, or press any key or clicker button, to fill it. With one screen, the window simply switches layout.
+- **Presenter:** this window stays where it is and shows your notes, timer and next slide. The slides open in a new window on the other display, with no toolbar; your first click, key or clicker press fills it without changing slide. Browsers need that one press; turn it off under *Settings* to keep the slides in a window. With one screen, the window simply switches layout.
 - **Viewer:** just the slides. Switch back with **P** or *Viewer*, which also ends the show on the projector.
-- **D** or the *Displays* button changes which display gets the slides at any time, even mid-talk. *Reset displays* closes the slides window and detects the screens again, with no need to reload the page.
+- **D** or the *Settings* button changes which display gets the slides at any time, even mid-talk. *Reset displays* closes the slides window and detects the screens again, with no need to reload the page.
 
 Safari and Firefox cannot move windows between displays: choose Presenter, drag the slides window onto the projector, then click it and press **F**.
+
+**Phone, tablet or Apple Watch:** press **R** and scan the QR code. The phone gets Next, Back, Black screen, the current slide and your notes,
+on Wi-Fi or mobile data with no app. The Apple Watch uses two iPhone Shortcuts; the steps and addresses are under *Apple Watch* on the phone page.
+The site is static, so commands pass through the public relay [ntfy.sh](https://ntfy.sh) on a private random channel. The remote stays off until you open it,
+and only commands such as `next` are sent. Keep the QR code private, since anyone with it can change slides; *New code* cancels the old one.
+The relay allows 250 messages a day per network, so keep a keyboard or clicker as a backup.
 
 **Clicker:** presentation remotes work with no setup. Forward and back send PageDown and PageUp (or media-track keys),
 the start button (F5 or Shift+F5) goes full screen instead of reloading, and the blank-screen button (`.` or B) goes black.
@@ -57,6 +64,7 @@ Keep the hidden `.nojekyll` file.
 ```
 index.html              viewer + all 34 slides (each slide is one <section class="slide">)
 embed-recreation.html   live illustration on slide 3 (canvas animation)
+remote.html             phone and tablet remote
 assets/                 LaTeX equations (eq-*.png), figures, animations (anim-*.gif), CQTS logo
 thumbs/                 slide thumbnails for the grid and presenter view
 fonts/                  Roboto (self-hosted)

@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>Remote · Topological Excitons in Biased Bilayer Graphene</title>
+<meta name="theme-color" content="#08080b">
+<meta name="robots" content="noindex">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--ink:#f5f5f7;--ink2:rgba(235,235,245,.68);--ink3:rgba(235,235,245,.42);--card:rgba(255,255,255,.08)}
+html,body{margin:0;height:100%;background:#08080b;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+body{display:flex;flex-direction:column;gap:12px;padding:calc(10px + env(safe-area-inset-top)) 14px calc(14px + env(safe-area-inset-bottom));touch-action:manipulation;-webkit-user-select:none;user-select:none}
+header{display:flex;align-items:center;gap:10px;font-size:14px;min-height:30px}
+#dot{width:9px;height:9px;border-radius:50%;background:#ff9f0a;flex:none;transition:background .3s}
+#dot.ok{background:#30d158}#dot.bad{background:#ff453a}
+#status{flex:1;min-width:0;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#count{font-weight:600;font-variant-numeric:tabular-nums}
+#count i{font-style:normal;color:var(--ink3);font-weight:400}
+main{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px}
+#thumb{width:100%;aspect-ratio:16/9;flex:none;border-radius:14px;background:#fff center/cover no-repeat}
+#notes{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;padding:2px 2px 6px;font-size:18px;line-height:1.45;color:var(--ink);-webkit-user-select:text;user-select:text}
+#notes h1{margin:0 0 6px;font-size:15px;font-weight:600;color:var(--ink2)}
+nav{display:grid;grid-template-columns:1fr 2.4fr;grid-template-rows:auto;gap:10px;flex:none}
+button{all:unset;box-sizing:border-box;display:grid;place-items:center;border-radius:20px;background:var(--card);color:var(--ink);font-size:17px;font-weight:600;cursor:pointer;transition:transform .16s,background .16s,opacity .2s}
+button:active{transform:scale(.97);background:rgba(255,255,255,.18)}
+button:disabled{opacity:.35}
+#next{height:112px;background:#4E057E;font-size:21px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+#next:active{background:#5f0a99}
+#prev{height:112px}
+#tools{display:flex;gap:10px;flex:none}
+#tools button{flex:1;height:46px;border-radius:14px;font-size:14px;font-weight:500;color:var(--ink2)}
+#black.on{background:#fff;color:#000}
+#sheet{position:fixed;inset:0;z-index:5;background:#101014;padding:calc(18px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom));overflow:auto;display:none;font-size:15px;line-height:1.45;-webkit-user-select:text;user-select:text}
+#sheet.on{display:block}
+#sheet h2{margin:0 0 4px;font-size:24px;letter-spacing:-.02em}
+#sheet p{color:var(--ink2);margin:6px 0 14px}
+#sheet ol{padding-left:22px;margin:0 0 16px}
+#sheet li{margin-bottom:9px}
+#sheet code{display:block;margin:6px 0 8px;padding:9px 11px;border-radius:10px;background:var(--card);font:12px ui-monospace,Menlo,monospace;word-break:break-all}
+#sheet button{display:inline-grid;height:38px;padding:0 14px;border-radius:11px;font-size:14px;font-weight:500;margin-right:8px}
+@media (min-width:760px) and (min-height:500px),(orientation:landscape){
+  body{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto auto;gap:12px 18px;padding-left:calc(16px + env(safe-area-inset-left));padding-right:calc(16px + env(safe-area-inset-right))}
+  header{grid-column:1/-1}
+  main{display:contents}
+  #thumb{grid-column:1;grid-row:2;align-self:start;max-height:100%}
+  #notes{grid-column:2;grid-row:2/5}
+  nav{grid-column:1;grid-row:3}
+  #tools{grid-column:1;grid-row:4}
+}
+@media (orientation:landscape) and (max-height:500px){#next,#prev{height:64px}#tools button{height:38px}#notes{font-size:16px}}
+</style>
+</head>
+<body>
+<header><span id="dot"></span><span id="status">Connecting…</span><span id="count"></span></header>
+<main>
+  <div id="thumb" role="img" aria-label="Current slide"></div>
+  <div id="notes"></div>
+</main>
+<nav>
+  <button id="prev" aria-label="Previous slide">Back</button>
+  <button id="next">Next</button>
+</nav>
+<div id="tools">
+  <button id="black">Black screen</button>
+  <button id="first">First slide</button>
+  <button id="watch">Apple Watch</button>
+</div>
+
+<div id="sheet" role="dialog" aria-label="Apple Watch setup">
+  <h2>Apple Watch</h2>
+  <p>A watch can't scan this page, so it uses two small Shortcuts on your iPhone. You only set this up once.</p>
+  <ol>
+    <li>Open <b>Shortcuts</b> on your iPhone and tap <b>+</b>.</li>
+    <li>Add the action <b>Get Contents of URL</b> and paste this address:
+      <code id="unext"></code><button id="cnext">Copy address</button></li>
+    <li>Name it <b>Next slide</b>. In its details, turn on <b>Show on Apple Watch</b>.</li>
+    <li>Make a second shortcut called <b>Back</b> with this address:
+      <code id="uprev"></code><button id="cprev">Copy address</button></li>
+    <li>On the watch, open <b>Shortcuts</b>, or add it to your watch face for one-tap access.</li>
+  </ol>
+  <p>Allow a second or two per tap. Using “New code” on the computer means setting these up again.</p>
+  <button id="close">Done</button>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const room = location.hash.slice(1);
+  const RELAY = 'https://ntfy.sh/';
+  const me = Math.random().toString(36).slice(2, 7);
+  let slides = [], n = 0, black = false, live = false, seen = new Set(), wait;
+
+  const status = (text, cls = '') => { $('status').textContent = text; $('dot').className = cls; };
+  if (!/^cqts-[0-9a-f]{32}$/.test(room)) { status('Scan the QR code on your computer', 'bad'); return; }
+
+  function show() {
+    const s = slides[n];
+    $('count').innerHTML = slides.length ? `${n + 1} <i>/ ${slides.length}</i>` : '';
+    $('prev').disabled = n <= 0;
+    $('next').disabled = slides.length && n >= slides.length - 1;
+    $('black').classList.toggle('on', black);
+    if (!s) return;
+    $('thumb').style.backgroundImage = `url(thumbs/${s.id}.jpg)`;
+    const notes = $('notes'); notes.textContent = '';
+    const h = document.createElement('h1'); h.textContent = s.title;
+    notes.append(h, s.notes);
+    notes.scrollTop = 0;
+    if (slides[n + 1]) new Image().src = `thumbs/${slides[n + 1].id}.jpg`;
+  }
+  const clamp = v => Math.max(0, Math.min(Math.max(slides.length, 1) - 1, v));
+
+  function send(m) {
+    fetch(`${RELAY}${room}?cache=no`, { method: 'POST', body: `${m}~${me}` })
+      .then(r => { if (r.status === 429) status('Relay limit reached. Use your keyboard or clicker', 'bad'); })
+      .catch(() => status('No connection', 'bad'));
+  }
+  function press(cmd, change) {
+    navigator.vibrate?.(12);
+    change(); show(); send(cmd);
+  }
+  $('next').onclick = () => press('next', () => { n = clamp(n + 1); });
+  $('prev').onclick = () => press('prev', () => { n = clamp(n - 1); });
+  $('first').onclick = () => press('first', () => { n = 0; });
+  $('black').onclick = () => press('black', () => { black = !black; });
+
+  function hello() {
+    send('hello');
+    clearTimeout(wait);
+    wait = setTimeout(() => { if (!live) status('Open the talk on your computer', 'bad'); }, 7000);
+  }
+  function connect() {
+    const es = new EventSource(`${RELAY}${room}/sse`);
+    es.onopen = hello;
+    es.onerror = () => { live = false; status('Reconnecting…'); };
+    es.onmessage = e => {
+      let d; try { d = JSON.parse(e.data); } catch { return; }
+      if (d.event !== 'message' || seen.has(d.id)) return;
+      seen.add(d.id);
+      const [cmd, from] = String(d.message).split('~');
+      if (cmd.startsWith('at:')) {
+        const [, i, b] = cmd.split(':');
+        n = clamp(+i); black = b === '1'; live = true;
+        status('Connected', 'ok'); show();
+      } else if (from !== me) {
+        if (cmd === 'next') n = clamp(n + 1);
+        else if (cmd === 'prev') n = clamp(n - 1);
+        else if (cmd === 'first') n = 0;
+        else if (cmd === 'black') black = !black;
+        show();
+      }
+    };
+  }
+
+  // keep the screen awake while presenting
+  let lock;
+  const stayAwake = async () => { try { lock = await navigator.wakeLock?.request('screen'); } catch {} };
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) { stayAwake(); if (slides.length) hello(); } });
+  stayAwake();
+
+  // titles and notes come from the deck itself, so this page never goes out of date
+  fetch('index.html').then(r => r.text()).then(html => {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    slides = [...doc.querySelectorAll('section.slide')].map(s => ({
+      id: s.id,
+      title: (s.querySelector('h1,h2')?.textContent || s.id).trim(),
+      notes: (s.querySelector('aside')?.textContent || 'No notes for this slide.').trim()
+    }));
+    show(); connect();
+  }).catch(() => status('Could not load the talk', 'bad'));
+
+  // Apple Watch setup
+  const url = m => `${RELAY}${room}/publish?message=${m}&cache=no`;
+  $('unext').textContent = url('next'); $('uprev').textContent = url('prev');
+  $('watch').onclick = () => $('sheet').classList.add('on');
+  $('close').onclick = () => $('sheet').classList.remove('on');
+  const copy = (btn, text) => { btn.onclick = async () => { try { await navigator.clipboard.writeText(text); btn.textContent = 'Copied'; } catch { btn.textContent = 'Select the address above'; } }; };
+  copy($('cnext'), url('next')); copy($('cprev'), url('prev'));
+})();
+</script>
+</body>
+</html>
