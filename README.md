@@ -5,6 +5,8 @@ Center for Quantum and Topological Systems (CQTS), NYU Abu Dhabi.
 
 A self-contained HTML slide deck with its own viewer: no build step, no framework, no internet needed once downloaded.
 
+The main talk is slides 1 to 22, for 10 to 15 minutes. Slides 23 to 42 are an optional appendix with the full derivations; slide 23 links to each part.
+
 ## View it
 
 - **Online:** <https://sviatoslavgladyshev.github.io/cqts-exciton-talk/>
@@ -63,17 +65,18 @@ Keep the hidden `.nojekyll` file.
 ## Structure
 
 ```
-index.html              viewer + all 34 slides (each slide is one <section class="slide">)
+index.html              viewer + all 42 slides: 22 in the main talk, 20 in the appendix (each slide is one <section class="slide">)
 embed-recreation.html   live illustration on slide 3 (canvas animation)
 remote.html             phone and tablet remote
 assets/                 LaTeX equations (eq-*.png), figures, animations (anim-*.gif), CQTS logo
 thumbs/                 slide thumbnails for the grid and presenter view
 fonts/                  Roboto (self-hosted)
+latex/                  LaTeX source of equations added in the November 2026 revision
 PROMPT.md               prompt for asking an AI assistant to edit or extend this deck
 ```
 
 ## Credits
 
-Exciton figures on slides 17, 19 and 21 are reproduced from M. O. Sauer & T. G. Pedersen, *Phys. Rev. B* (2022), arXiv:2110.14428.
-The electronic-structure figures and animations are computed from the four-band continuum model (γ₀ = 3.0, γ₁ = 0.40, γ₃ = 0.30 eV).
+Exciton figures (dark-bright, anti-aligned and exciton-band slides) are reproduced from M. O. Sauer & T. G. Pedersen, *Phys. Rev. B* 105, 115416 (2022), arXiv:2110.14428.
+The electronic-structure figures and animations come from the author's continuum models (γ₀ = 3.0, γ₁ = 0.40, γ₃ = 0.30 eV) and are working calculations, not independently validated.
 Equations are typeset with LaTeX.

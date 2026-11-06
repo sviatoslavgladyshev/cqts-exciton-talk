@@ -7,9 +7,10 @@ canvas{position:absolute;inset:0;width:100%;height:100%}
 #chips div.done{border-color:#C9B3DD;color:#4E057E}
 #cap{position:absolute;left:28px;top:86px;width:900px;font-size:32px;font-weight:500;line-height:1.3;transition:opacity .3s}
 #cap small{display:block;font-size:24px;font-weight:400;color:#5F6368;margin-top:6px}
+#note{position:absolute;right:24px;bottom:12px;font-size:24px;color:#5F6368}
 #tag{position:absolute;font-size:22px;font-weight:600;color:#fff;background:#E37400;padding:6px 16px;border-radius:999px;opacity:0;transition:opacity .3s}
 </style>
-<canvas id="c"></canvas><div id="chips"></div><div id="cap"></div><div id="tag">Proposed</div>
+<canvas id="c"></canvas><div id="chips"></div><div id="cap"></div><div id="tag">Proposed</div><div id="note">Schematic · not a computed result</div>
 <script>
 const cv=document.getElementById('c'),g=cv.getContext('2d'),cap=document.getElementById('cap'),chips=document.getElementById('chips'),tag=document.getElementById('tag');
 let W,H,S,D=2;
@@ -42,9 +43,9 @@ function arrowF(){const a=P(7.2,-5.2,-3.2),b=P(7.2,-5.2,3.6);g.lineCap='round';g
  g.fillStyle='#5F6368';g.font='500 26px "Google Sans",Roboto,Arial';g.textAlign='left';g.fillText('Field F',b[0]+26,b[1]+14)}
 const ST=[['Bilayer','Two graphene sheets, AB-stacked','A perpendicular field opens a tunable gap.'],
  ['Light in','A photon arrives','Its energy creates an electron–hole pair.'],
- ['Bind','The pair binds into an exciton','Electron on top, hole below: an interlayer exciton.'],
+ ['Bind','The pair binds into an exciton','Drawn with the electron on top. Real states mix layers.'],
  ['Move','It travels as one neutral particle','No net charge, but it carries energy.'],
- ['Bend?','Does its path bend sideways?','That is what this project asks: exciton Berry curvature.'],
+ ['Bend?','Does its path bend sideways?','Our open question: exciton Berry curvature.'],
  ['Light out','It recombines and glows','A photon leaves, almost straight up.']];
 ST.forEach(s=>{const d=document.createElement('div');d.textContent=s[0];chips.appendChild(d)});
 const T=19;let last=-1,trail=[];
