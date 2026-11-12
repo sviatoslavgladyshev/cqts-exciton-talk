@@ -4,9 +4,10 @@ Generated from the `<aside>` notes in `index.html` (the same text appears in the
 The notes are deliberately fuller than a script (about 4,300 words for the main talk): on the results slides the first paragraph is the plain spoken version, and the rest explains the mathematics and the physics for questions.
 Timing cues in brackets add up to 20:00 (slide 2 has no cue in its preserved notes and takes 0:40): introduction 1:00 · motivation 3:00 · bilayer graphene 4:00 · excitons 4:00 · results 6:45 · Ateno 0:30 · conclusion 0:45.
 
-### 1. Topological excitons in biased bilayer graphene.  
+### 1. A Tale of Two Valleys: The Hidden Geometry of Excitons  
 
 [0:20] Title.
+The title borrows from Dickens, A Tale of Two Cities: here the two valleys are K and K′, and the hidden geometry is the Berry curvature of the excitons, which, as we will see, comes out opposite in the two valleys.
 The question of this talk is in blue: can we have topological excitons in biased bilayer graphene? By that I mean topology or quantum geometry of the exciton states themselves, as functions of the exciton's own centre-of-mass momentum Q, not the well-known topology of the electron bands.
 Since the last version of this talk I have carried out the calculation: a finite-momentum Bethe–Salpeter calculation in a four-orbital lattice model, followed by a non-Abelian Berry-curvature calculation for the lowest exciton states. So today the second half of the talk presents actual model results.
 Throughout I will keep four things apart: established electronic topology, published exciton physics, my own numerical model results, and what is still open. The work is supervised by Dr. Marwa Mannai at CQTS, NYU Abu Dhabi.

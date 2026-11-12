@@ -5,7 +5,7 @@ Copy everything below the line into Claude (or another assistant) and attach `in
 ---
 
 You are editing a self-contained HTML slide deck hosted on GitHub Pages. It is a research symposium talk:
-"Topological excitons in biased bilayer graphene" by Sviatoslav Gladyshev, supervised by Dr. Marwa Mannai,
+"A Tale of Two Valleys: The Hidden Geometry of Excitons" (on topological excitons in biased bilayer graphene) by Sviatoslav Gladyshev, supervised by Dr. Marwa Mannai,
 Center for Quantum and Topological Systems (CQTS), NYU Abu Dhabi. The audience is academic, so physics must be correct
 and anything not yet computed must stay labelled "proposed" or "schematic". The exciton Berry curvature *has* been computed
 (lattice finite-Q BSE, non-Abelian Wilson loops for the lowest exciton doublet; slides 13–18 and Appendix C). Never change those numbers,

@@ -1,4 +1,6 @@
-# Topological excitons in biased bilayer graphene
+# A Tale of Two Valleys: The Hidden Geometry of Excitons
+
+Can we have topological excitons in biased bilayer graphene?
 
 Research symposium talk by **Sviatoslav Gladyshev**, supervised by **Dr. Marwa Mannai**,
 Center for Quantum and Topological Systems (CQTS), NYU Abu Dhabi.

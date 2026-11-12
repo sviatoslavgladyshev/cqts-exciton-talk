@@ -1,5 +1,7 @@
 # Exciton Berry curvature in biased AB bilayer graphene: results summary
 
+For the talk *A Tale of Two Valleys: The Hidden Geometry of Excitons*.
+
 Sviatoslav Gladyshev · for review by Dr. Marwa Mannai · CQTS, NYU Abu Dhabi · November 2026
 
 **Question.** Can we have topological excitons in biased bilayer graphene? That is, do the exciton states carry Berry curvature or topology as functions of their own centre-of-mass momentum Q, separately from the known valley Chern numbers of the electrons?
