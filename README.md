@@ -5,8 +5,8 @@ Center for Quantum and Topological Systems (CQTS), NYU Abu Dhabi.
 
 A self-contained HTML slide deck with its own viewer: no build step, no framework, no internet needed once downloaded.
 
-The main talk is slides 1 to 19, for 20 minutes, and slide 20 lists the sources. It presents completed calculations of exciton Berry curvature in a lattice finite-momentum Bethe–Salpeter model.
-Slides 21 to 53 are backup slides: A electronic derivations, B exciton mathematics, C results methods and checks, D the earlier proposal, E Ateno. Slide 21 links to each part.
+The main talk is slides 1 to 20, for 20 minutes (slide 19 is one slide on Ateno, slide 20 the conclusion), and slide 21 lists the sources. It presents completed calculations of exciton Berry curvature in a lattice finite-momentum Bethe–Salpeter model.
+Slides 22 to 53 are backup slides: A electronic derivations, B exciton mathematics, C results methods and checks, D the earlier proposal. Slide 22 links to each part.
 Speaker notes for every slide, with timings, are also in `docs/SPEAKER_NOTES.md`.
 
 ## View it
@@ -29,6 +29,8 @@ Speaker notes for every slide, with timings, are also in `docs/SPEAKER_NOTES.md`
 | **P** | Switch between Viewer and Presenter (also the switch in the toolbar) |
 | **D** | Settings: choose a display, reset the displays, turn automatic full screen on or off |
 | **R** | Phone or tablet remote: scan the QR code |
+| **S** | Presenter: send the slides back to the projector (after it was unplugged) |
+| **E** | Erase the drawing on this slide |
 | **B** or **.** | Black screen; any key brings the slide back |
 | **?** | Keyboard shortcuts |
 | Esc | Close the grid, notes or shortcuts |
@@ -43,15 +45,16 @@ Chrome or Edge, and press **P** or choose *Presenter* in the toolbar. The first 
 
 - **Presenter:** this window stays where it is and shows your notes, timer and next slide. The slides open in a new window on the other display, with no toolbar; your first click, key or clicker press fills it without changing slide. Browsers need that one press; turn it off under *Settings* to keep the slides in a window. With one screen, the window simply switches layout.
 - **Viewer:** just the slides. Switch back with **P** or *Viewer*, which also ends the show on the projector.
+- **Projector unplugged and plugged back in:** the slides go back to it by themselves; if the browser does not allow that, the next key or clicker press does it. *Send slides to display* in the presenter header, or **S**, does the same by hand. No need to leave Presenter.
 - **D** or the *Settings* button changes which display gets the slides at any time, even mid-talk. *Reset displays* closes the slides window and detects the screens again, with no need to reload the page.
 
 Safari and Firefox cannot move windows between displays: choose Presenter, drag the slides window onto the projector, then click it and press **F**.
 
-**Phone, tablet or Apple Watch:** press **R** and scan the QR code. Connected remotes appear in that sheet, in Settings and at the top of the presenter screen. The phone gets Next, Back, Black screen, a laser pointer (drag on the slide preview), the current slide and your notes,
+**Phone, tablet or Apple Watch:** press **R** and scan the QR code. Connected remotes appear in that sheet, in Settings and at the top of the presenter screen. The phone gets Next, Back, Black screen, a laser pointer (drag on the slide preview), the current slide and your notes, and *Draw · Point*: a full-screen pad (turned on its side on an upright phone, about three times the area) with laser, pen in four colours, Undo and Clear. Drawings appear on the projector and stay on their slide until cleared,
 on Wi-Fi or mobile data with no app. The Apple Watch uses two iPhone Shortcuts; the steps and addresses are under *Apple Watch* on the phone page.
-The site is static, so commands pass through the public relay [ntfy.sh](https://ntfy.sh) on a private random channel. The remote stays off until you open it,
-and only commands such as `next` are sent. The laser needs faster updates, so it uses a public MQTT broker (HiveMQ, with EMQX as backup) and sends only the pointer position. Keep the QR code private, since anyone with it can change slides; *New code* cancels the old one.
-The relay allows 250 messages a day per network, so keep a keyboard or clicker as a backup.
+The site is static, so phone and computer talk through public relays on a private random channel: first public MQTT brokers (HiveMQ and EMQX, both at once, no daily limit), and [ntfy.sh](https://ntfy.sh) as the fallback and for the Apple Watch. The remote stays off until you open it,
+and only commands, pointer positions and pen strokes are sent. The computer answers every command with the slide now showing; a command with no answer in 1.5 s is sent again through the other relay, and the phone shows *Reconnecting…* if the computer stops answering. Links that went quiet (a phone that slept, a network change) are reopened automatically. Keep the QR code private, since anyone with it can change slides; *New code* cancels the old one.
+ntfy.sh allows 250 messages a day per network, but it is now only the fallback; keep a keyboard or clicker as a backup anyway.
 
 **Clicker:** presentation remotes work with no setup. The clicker has its own indicator on the presenter screen, separate from remotes, which turns to *Clicker detected* at the first press of a clicker-style key (PageDown, PageUp, F5 or a media key). Clickers that send arrow keys are recognised by their very brief presses. If yours is not, use *Detect* in Settings: pick it from Chrome's USB list, or press forward on it when asked. Forward and back send PageDown and PageUp (or media-track keys),
 the start button (F5 or Shift+F5) goes full screen instead of reloading, and the blank-screen button (`.` or B) goes black.

@@ -1,10 +1,10 @@
 # Speaker notes — 20-minute talk
 
 Generated from the `<aside>` notes in `index.html` (the same text appears in the presenter view, the **N** panel and the phone remote).
-The notes are deliberately fuller than a script (about 4,200 words for the main talk, roughly 30 minutes if read aloud): the first sentences of each slide are the spoken core, and the rest explains the mathematics and the physics for questions.
-Timing cues in brackets add up to 20:00: introduction 1:00 · motivation 3:00 · bilayer graphene 4:00 · excitons 4:00 · results 7:00 · conclusion 1:00.
+The notes are deliberately fuller than a script (about 4,300 words for the main talk): on the results slides the first paragraph is the plain spoken version, and the rest explains the mathematics and the physics for questions.
+Timing cues in brackets add up to 20:00 (slide 2 has no cue in its preserved notes and takes 0:40): introduction 1:00 · motivation 3:00 · bilayer graphene 4:00 · excitons 4:00 · results 6:45 · Ateno 0:30 · conclusion 0:45.
 
-### 1. Topological excitons in biased bilayer graphene  
+### 1. Topological excitons in biased bilayer graphene.  
 
 [0:20] Title.
 The question of this talk is in blue: can we have topological excitons in biased bilayer graphene? By that I mean topology or quantum geometry of the exciton states themselves, as functions of the exciton's own centre-of-mass momentum Q, not the well-known topology of the electron bands.
@@ -13,7 +13,7 @@ Throughout I will keep four things apart: established electronic topology, publi
 
 ### 2. Why excitons?  
 
-[0:40] An exciton is an electron and a hole bound together, so it carries energy but no net charge. That makes it hard to steer with an ordinary voltage. Our hypothesis is that the geometry of the exciton band gives another handle on its motion, and that hypothesis is untested here.
+An exciton is an electron and a hole bound together, so it carries energy but no net charge. That makes it hard to steer with an ordinary voltage. Our hypothesis is that the geometry of the exciton band gives another handle on its motion, and that hypothesis is untested here.
 
 ### 3. Excitons are already being routed and switched.  
 
@@ -96,17 +96,22 @@ The rest of the talk is my calculation. Six slides: the model, the exciton energ
 6. Their eigenphases give the eigenvalues of the 2×2 non-Abelian Berry curvature.
 Parameters on the right: standard hoppings; U = +100 meV as the working point; κ = 4.5 a uniform dielectric environment; 3.35 Å layer spacing; 0.6 Å Gaussian orbital radius as a short-distance form factor. These are assumptions of the model, not measured properties of a fabricated device. U is set directly; gates and anisotropic hBN are not modelled.
 
-### 14. A bound, nearly degenerate doublet below the continuum.  
+### 14. Excitons are bound, and come in pairs.  
 
-[1:00] First result: the exciton energies at Q = 0, from the most refined run — 1980 k points in the BSE, screening computed on 5712 k points.
+[1:00] Left: the energy ladder at Q = 0. Right: how the energy changes when the whole exciton moves.
+Say it simply: the lowest exciton sits at 70 meV; you need 23 meV more to tear it apart into a free electron and hole; and the lowest level is really two states with the same energy, one from each valley. The next states are 9 meV higher, so this pair is well isolated. On the right, the pair rises as Q grows, like a particle with mass, and the two partners split slightly away from Q = 0 because exchange couples the valleys. The right panel is the 864-point grid, so it starts at 70.8 rather than 70.0.
+Details if asked. First result: the exciton energies at Q = 0, from the most refined run — 1980 k points in the BSE, screening computed on 5712 k points.
 The lowest exciton lies at 70.016 meV. The lowest free electron–hole pair energy on the same discrete grid is 92.790 meV. So, relative to that threshold, the exciton is bound by 22.77 meV. I quote the threshold of the discretized model deliberately: it is the consistent reference for a binding energy within this calculation. Practically: about 70 meV for the excitation and about 23 meV of binding.
 The two lowest states are almost exactly degenerate: their splitting at Q = 0 is 1.3 × 10⁻⁹ eV, a nano-electron-volt, which is numerically zero for our purposes. Physically they are the K-like and K′-like excitons, related by time reversal, mixed by exchange.
 The next exciton level is 9.3 meV higher at Q = 0. Including the corners of the standard Wilson loop around Q = 0 (side 1.5 × 10⁻³ Å⁻¹) the minimum separation is 9.25 meV, and over the whole local map it never drops below 9.0 meV. This gap is what makes the doublet a well-defined two-dimensional subspace — the precondition for the curvature calculation.
 These are numerical results of the model on the previous slide, with its assumed parameters; they are not measurements and not GW-corrected.
 
-### 15. Opposite, valley-locked curvature in the lowest exciton doublet.  
+### 15. The lowest excitons curve in opposite ways in the two valleys.  
 
-[1:30] The central result.
+[1:30] The central result. Plain version first.
+Berry curvature measures how the quantum state of the exciton twists as its momentum changes. Here the twist is large, about 730 square ångström, and it has opposite signs in the two valleys: K-valley excitons blue, K′-valley excitons red. Each tile is one point I computed; the strongest twist is at Q = 0, the centre tile, and it stays the same sign across the patch.
+Because the two lowest excitons have exactly the same energy, I treat them together as a pair. That gives two curvature values, λ₋ and λ₊, which is what the map titles say.
+Technical version, if asked.
 For the lowest two-state exciton subspace I compute the 2×2 non-Abelian Berry curvature matrix F_xy(Q). Its two eigenvalues at Q = 0 are approximately −7.3 × 10² Å² and +7.3 × 10² Å². The most refined number — 1980 k points and the smallest Wilson loop, side 3.75 × 10⁻⁴ Å⁻¹ — is ∓733.85 Å². I quote it as 7.3 × 10² because the numerical uncertainty is far larger than the last decimals.
 For scale: Berry curvature has units of area; √734 Å² ≈ 27 Å, which is a length of the order of an exciton size in this system. It is large compared with typical electron Berry curvatures near the band edge of strongly gapped materials, but I would not compare magnitudes across definitions without care.
 Valley structure: each eigenvalue comes with an eigenvector inside the doublet. Measuring how much of that eigenvector sits in valley K versus K′ gives valley polarizations +0.999912 and −0.999912. So λ₋ belongs to an essentially pure K exciton and λ₊ to an essentially pure K′ exciton. That is what "opposite valley-associated excitonic geometry" means: K-like and K′-like excitons have opposite Berry curvature, as time reversal requires, and the calculation resolves this even though exchange mixes the valleys in the energy eigenstates.
@@ -124,7 +129,7 @@ Contrast at the bottom: the doublet has eigenvalues of ±7.3 × 10² Å², while
 
 ### 17. Stable under refinement and gauge changes.  
 
-[1:00] How much should we trust 7.3 × 10² Å²?
+[0:45] How much should we trust 7.3 × 10² Å²?
 Panel (a): refining the electronic k grid of the BSE at a fixed loop side of 1.5 × 10⁻³ Å⁻¹. 456 points give 771.3 Å², 864 give 741.5, 1980 give 735.9. The change is 30 Å² for the first refinement and 5.5 Å² for the second, so the scale 7.3–7.4 × 10² Å² is stable, but the value is not converged to the last digit. The exciton energy over the same refinement goes from 71.0 to 70.0 meV.
 Panel (b): at 1980 points, halving the loop side twice: 735.9, 734.9, 733.8 Å². A finite Wilson loop measures the average curvature flux through the square; the curvature is peaked at Q = 0, so smaller loops approach the local value at the centre from above. That is why the most refined local estimate, 733.85 Å², is slightly below the fixed-loop numbers.
 Right column, the checks. The result is gauge-invariant as it must be: assigning random phases to all electronic Bloch states changes the curvature by 6 × 10⁻¹⁰ Å²; random U(2) rotations of the exciton doublet change the eigenvalues by about 10⁻⁹ Å². Refining the screening grid from level 7 to 8 changes |λ| by 0.002 Å² and the energy by 0.003 meV. Doubling the reciprocal-lattice sum in the exchange changes |λ| by 0.0006 Å². The doublet remains at least 9.0 meV below the third state over the whole map, so the two-state subspace is well defined everywhere it was used. The iterative eigensolver reproduces dense diagonalization on a test grid.
@@ -138,9 +143,13 @@ What it does not show. Four: the trace of the curvature matrix, λ₊ + λ₋, i
 So my answer is the boxed sentence. We have computed substantial, valley-contrasting non-Abelian exciton Berry curvature in a model of biased bilayer graphene. Whether this becomes a nontrivial global excitonic topological phase, or a measurable anomalous transport signature — for example a valley-selective sideways drift when the valleys are populated unequally — remains open.
 Footer: the main approximations. No GW, no dynamic screening, no spin–orbit coupling or triplets, no phonons or disorder, no full ab initio dielectric matrix, no calibrated device. I do not claim a topological exciton insulator.
 
-### 19. Can we have topological excitons in biased bilayer graphene?  
+### 19. Ateno AX.  
 
-[1:00] To conclude, back to the question on the cover.
+[0:30] Thirty seconds on Ateno, which I co-founded, before I close. We are building a dedicated chip for on-device 3D mapping based on Gaussian splatting, for warehouses, mines and tunnels, construction and inspection drones. The FPGA prototype renders a 1080p frame of 173,161 Gaussians; per-frame time went from 1.02 s to 262 ms in ten days. Early stage: no silicon yet, tape-out with design partners is next. The common thread with the physics: understand the structure, then put the computation where it is needed.
+
+### 20. Can we have topological excitons in biased bilayer graphene?  
+
+[0:45] To conclude, back to the question on the cover.
 Established: the electrons of biased bilayer graphene have valley Chern numbers that reverse with the bias.
 Published: the excitons are strongly bound, field-tunable, and bright and dark states cross at strong field (Sauer and Pedersen).
 Computed here: in a four-orbital, two-valley, finite-Q Bethe–Salpeter model with RPA screening and exchange, the lowest exciton doublet carries valley-locked non-Abelian Berry curvature of about ±7.3 × 10² Å² near Q = 0, robust to gauge changes and to grid refinement within the model.
@@ -148,7 +157,7 @@ Open: whether that local geometry adds up to a global exciton invariant, whether
 So: we can say that excitons in this model have substantial valley-contrasting geometry; we cannot yet say they are topological in the strong sense.
 Thank you to Dr. Marwa Mannai and to CQTS. I am happy to take questions; derivations, convergence tables and checks are in the appendix.
 
-### 20. Sources.  
+### 21. Sources.  
 
 Every entry links to its source. Electronic figures come from my own continuum and lattice models with McCann–Koshino parameters; the exciton figures on the published-physics slides are reproduced from Sauer and Pedersen with attribution. All exciton Berry-curvature numbers and plots are from my own lattice Bethe–Salpeter calculation, generated directly from its saved output files.
 
@@ -156,105 +165,105 @@ Every entry links to its source. Electronic figures come from my own continuum a
 
 ## Appendix (backup, for questions)
 
-### 21. Appendix.  
+### 22. Appendix.  
 
 Stop here in the main talk. These slides are for questions. Click a section title to jump straight to it. Section C holds every number behind the results slides.
 
-### 22. Four bands, then two, with threefold warping.  
+### 23. Four bands, then two, with threefold warping.  
 
 We start from the standard four-band model of bilayer graphene and reduce it to two low-energy bands. Skew hopping warps the band edge into a threefold pattern, which matters because excitons are built from these states. This is my own analytic working calculation, and the seven-step derivation is in the appendix.
 
-### 23. The four-band Hamiltonian.  
+### 24. The four-band Hamiltonian.  
 
 Basis A1, B1, A2, B2 near valley K. Intralayer Dirac hopping alpha0 pi on the off-diagonal blocks, the dimer coupling gamma1 between B1 and A2, the skew hopping alpha3 between the non-dimer sites, and plus or minus U over 2 on the diagonal. K-prime follows by time reversal. Every result in the next slides is derived from this matrix.
 
-### 24. Eliminating the dimer sites.  
+### 25. Eliminating the dimer sites.  
 
 The dimer sites B1 and A2 are pushed to plus or minus gamma1 by the strong interlayer bond. Eliminating them with a Schur complement and expanding to leading order in E over gamma1 gives an effective two-band Hamiltonian on the non-dimer sites A1 and B2. The only second-order path is A1 to B1, across the dimer bond, then A2 to B2, which produces the quadratic term minus alpha0 squared over gamma1 times pi-dagger squared; the skew hop gives the linear alpha3 pi term directly.
 
-### 25. Spectrum and threefold symmetry.  
+### 26. Spectrum and threefold symmetry.  
 
 Writing pi = k e^(i theta), h has two terms with different winding. Their interference gives the cos 3 theta term in |h| squared, which is the analytic origin of trigonal warping. The exact four-band secular equation is quadratic in E squared, and its constant term contains the same cos 3 theta piece, minus 2 gamma1 alpha3 alpha0 squared k cubed cos 3 theta. Because cos 3(theta + 2 pi/3) = cos 3 theta, the spectrum is invariant under 2 pi/3 rotations only: C infinity is reduced to C3. With gamma3 = 0 the angle drops out of the determinant altogether.
 
-### 26. Where the bands touch.  
+### 27. Where the bands touch.  
 
 At zero bias, a band touching requires h = 0. Factoring out k e^(-2i theta) leaves alpha3 e^(3i theta) = beta k. Since k is real and positive, e^(3i theta) = 1, so theta = 0, 2 pi/3, 4 pi/3, at radius k_s = alpha3/beta = 2 gamma1 gamma3 over root 3 a gamma0 squared, about 6.26 times 10^-3 inverse angstrom. Together with k = 0 this gives one central and three satellite Dirac points, plotted on the right.
 
-### 27. Winding numbers, computed.  
+### 28. Winding numbers, computed.  
 
 Definition: the winding number counts how many times the pseudospin vector d rotates as k goes once around a contour. Without gamma3, d = minus beta k squared (cos 2 theta, sin 2 theta); the numerator of the winding integrand is 2 beta squared k^4 and the denominator beta squared k^4, so w = +2 exactly. With gamma3, near k = 0 the linear term dominates, d is approximately alpha3 (kx, -ky), which rotates clockwise: w = -1. Expanding around the satellite at (k_s, 0), the constant terms cancel because beta k_s = alpha3, and the Jacobian is diag(-alpha3, -3 alpha3) with positive determinant, so w = +1. C3 maps the satellites onto each other preserving orientation. Total: -1 + 3 = +2.
 
-### 28. Watch the pseudospin wind.  
+### 29. Watch the pseudospin wind.  
 
 Animation of the winding numbers derived on the previous slide. Left: k goes once around K. Middle: for the quadratic touching (gamma3 = 0), d = -beta k^2 (cos 2 theta, sin 2 theta) turns twice in the same direction: w = +2. Right: near the central Dirac point with gamma3, d is approximately alpha3 (kx, -ky), which turns once the other way: w = -1. The counters show the accumulated winding.
 
-### 29. Berry curvature in closed form.  
+### 30. Berry curvature in closed form.  
 
 For a two-band Hamiltonian d dot sigma, the Berry curvature is minus-plus one half d dot the cross product of its momentum derivatives over |d| cubed. With d = (alpha3 kx - beta(kx^2 - ky^2), -alpha3 ky - 2 beta kx ky, u) the cross product has only a z component, 4 beta^2 k^2 - alpha3^2, and the triple product is u times that. Hence the closed form. Two corollaries: the curvature is odd in U, so reversing the bias reverses the valley Hall response while the energies are even; and the curvature changes sign on the ring k = alpha3 / 2 beta, which is where the lobes in the Berry-curvature animation come from.
 
-### 30. Valley Chern number, integrated.  
+### 31. Valley Chern number, integrated.  
 
 Integrate the curvature over the plane at gamma3 = 0, where it is independent of theta. The angular integral gives 2 pi; the radial integral is minus-plus 2 u beta squared times integral of k cubed over (u^2 + beta^2 k^4)^(3/2). Substituting t = beta k^2 turns it into minus-plus u times integral of t over (u^2 + t^2)^(3/2), whose antiderivative is minus 1 over root(u^2 + t^2). Evaluated from 0 to infinity this gives minus-plus u over |u|, so C = minus-plus sgn U. K-prime has the opposite sign by time reversal, so the net charge Chern number vanishes; what survives is a valley Chern number.
 
-### 31. Why γ₃ cannot change it.  
+### 32. Why γ₃ cannot change it.  
 
 Two independent arguments that trigonal warping leaves the valley Chern number unchanged. First, topological: for nonzero bias the gap 2 root(u^2 + |h|^2) is at least |U| everywhere, so turning on gamma3 is an adiabatic deformation, and the Chern number is fixed by the asymptotic winding, w infinity = 2, giving minus-plus sgn u. Second, local: each massive Dirac point contributes minus-plus w_D over 2 times sgn u. The central point (w = -1) gives plus-minus one half, the three satellites (w = +1) give minus-plus three halves; the sum is minus-plus sgn U, the same answer. These are two-band results; the four-band values remain predictions to be checked with a converged four-band integration.
 
-### 32. The exciton, as an equation.  
+### 33. The exciton, as an equation.  
 
 Note on conventions: this slide follows the Sauer–Pedersen notation with the electron at k + Q and the hole at k. My own calculation uses the symmetric choice, electron at k + Q/2 and valence state at k − Q/2 (Appendix C). The two labelings are related by a shift of k; the geometry calculation must use one convention consistently, and mine is the symmetric one. The exciton at centre-of-mass momentum Q is a superposition of electron-hole transitions with Bethe-Salpeter coefficients A. The BSE is an eigenvalue problem: band energy differences plus a kernel with a screened direct attraction and a repulsive exchange part. In a bilayer the direct kernel splits into intralayer and interlayer pieces; the interlayer one is softened by the vertical separation 2d of about 3.48 angstroms. The optical matrix element P is a coherent sum of single-transition matrix elements weighted by A, so contributions can cancel (dark) or add (bright). The exciton energy is the gap minus the binding energy.
 
-### 33. Why the ground exciton is dark.  
+### 34. Why the ground exciton is dark.  
 
 In the rotationally symmetric continuum picture, the exciton carries total angular momentum m = m_pseudo + m_env, with m_pseudo = -2 in K and +2 in K-prime. Normal-incidence light needs m = plus or minus 1. A 1s envelope has m_env = 0, so m = plus or minus 2: forbidden, dark. A 2p envelope with m_env = plus or minus 1 gives m = plus or minus 1: bright. Trigonal warping reduces C infinity to C3, where angular momentum is only defined modulo 3, and -2 is congruent to +1 mod 3, so the coupling is allowed by symmetry but small, set by the warping strength. That is why the ground state is mostly, not completely, dark. The emission rate goes as |P| squared times sin squared phi, the classical dipole pattern.
 
-### 34. Interlayer, anti-aligned excitons.  
+### 35. Interlayer, anti-aligned excitons.  
 
 At low field the anti-aligned interlayer configuration dominates: hole bottom, electron top, dipole opposite to the field, because of the bias-induced charge redistribution. As the field grows, intralayer weight increases, the electron-hole overlap and so |P| grow: this links to the dark-to-bright switch. The field controls the layer composition, hence the dipole, of the composite.
 
-### 35. Light-like excitons from exchange.  
+### 36. Light-like excitons from exchange.  
 
 Exchange couples the K and K-prime excitons. Its matrix element is proportional to 1/Q times (Q dot p_K star)(Q dot p_K-prime), where p is the interband momentum matrix element at the valley. The numerator is quadratic in Q and the prefactor removes one power, so the coupling is linear in Q, and the splitting 2|<K|v_x|K-prime>| is linear in Q. One combination becomes light-like, E0 + alpha|Q|, with P parallel to Q; the other is particle-like, E0 + hbar^2 Q^2 / 2M, with P perpendicular to Q. For the dark exciton p is approximately zero, so the same formula predicts almost no splitting, which is what the DFT-BSE calculation finds.
 
-### 36. Light cone, lifetime, temperature.  
+### 37. Light cone, lifetime, temperature.  
 
 Radiative decay must conserve energy and in-plane momentum, so only excitons with Q below omega over c can emit directly: the light cone. With hbar omega = 0.2 eV and hbar c = 1973 eV angstrom this is about 10^-4 inverse angstrom, a hundred times smaller than the inter-minivalley scale, so the trigonal anisotropy barely matters for emission. The observable rate is a Boltzmann average over exciton bands and momenta; the lifetime is its inverse. With a dark ground state, tau first drops as bright states are populated above the onset temperature (E3 - E1)/4 k_B, then rises again as excitons spread outside the light cone. The emission angle follows from sin theta = cQ/omega.
 
-### 37. Why τ(T) drops, then rises.  
+### 38. Why τ(T) drops, then rises.  
 
 Schematic with illustrative parameters, not the paper data. Left: dark and bright exciton bands with their thermal populations; the yellow strip is the light cone, exaggerated for visibility. Right: the resulting radiative lifetime. At low T almost everything sits in the dark state, so tau is long. As T rises the bright band is populated and tau drops. At higher T excitons spread to large Q, outside the light cone, and tau rises again. This reproduces qualitatively the non-monotonic tau(T) found by Sauer and Pedersen.
 
-### 38. Minivalleys imprint on the exciton band.  
+### 39. Minivalleys imprint on the exciton band.  
 
 This is the exciton energy plotted against its own momentum Q. The threefold pattern of the electrons shows up in the exciton band at higher field. But this is only energy, so it says nothing yet about exciton Berry curvature, which is the quantity we want.
 
-### 39. Interaction model used in the calculation.  
+### 40. Interaction model used in the calculation.  
 
 Backup: the interaction model. The polarization Π is computed from the same four-band electronic states as the BSE, at T = 0 for the neutral insulator, resolved into the two layers, with a factor 2 for spin; both valleys are already in the full-zone k sum. V is the bare layer-resolved Coulomb interaction in a uniform dielectric κ = 4.5, with the Gaussian orbital form factor exp(−r_o²q²/2), r_o = 0.6 Å, which sets the short-distance behaviour; it is a model form factor, not an ab initio pz orbital. W = (1 − VΠ)⁻¹V.
 Approximations: Π is averaged over six directions of q and interpolated on 110 logarithmic points, so it keeps the dependence on |q| and the layer matrix but not the full angular dependence; the full dielectric matrix in G, G′ is not computed; W is static. No adjustable screening wavevector from my earlier models is used.
 Direct kernel: D sums W over reciprocal vectors with the orbital phase factors exp(iG·(τa − τb)), with orbital positions τ = (0, δ1, δ1, 2δ1). Exchange uses transition densities u*_c u_v, the unscreened V and momentum Q + G with 19 vectors G (37 checked); at Q = G = 0 the divergent term cancels by orthogonality of c and v while a finite interlayer term survives.
 
-### 40. Every run behind the results.  
+### 41. Every run behind the results.  
 
 Backup: the full convergence record. All rows are from the JSON output files. The trend with BSE grid is monotonic: 771 → 741 → 736 Å², with the energy settling near 70.0 meV; the screening grid matters far less than the BSE grid (the two 1980 rows differ by 0.002 Å² and 0.003 meV). The loop-size series shows the finite-loop average approaching the local value. The min-link column is the smallest singular value of the doublet overlap on the loop: always above 0.997, so the subspace is well transported. The 192-point grid is a cautionary example: a coarse uniform grid misses the narrow valleys and gives an unphysical answer (128 meV, 35 Å²), which is why the production grids are dense near K and K′. I did not extrapolate to infinite k-point density, and I do not claim full convergence.
 
-### 41. Checks of gauge invariance and numerics.  
+### 42. Checks of gauge invariance and numerics.  
 
 Backup: the individual checks, all from the output files. Re-solving the BSE after random phases on every electronic eigenvector changes the energies only at machine precision, and the curvature by 6 × 10⁻¹⁰ Å²; random U(2) rotations of the exciton pair change the curvature eigenvalues by ~10⁻⁹ Å². The Hamiltonian satisfies H(k+G) = D†(G) H(k) D(G) with the orbital phase matrix to 6 × 10⁻¹⁵ eV, and reduces to my continuum Hamiltonian near K to 10⁻¹¹ eV. I independently rebuilt every Wilson loop of the map from the stored raw 2×2 overlap matrices: agreement to 6 × 10⁻¹⁰ Å².
 One important caveat: invariance under phases and U(2) rotations does not mean independence of every convention. Exciton Berry curvature depends on which point of the pair is used as the coordinate — electron, hole or centre — and on the orbital embedding. I use the symmetric centre and the embedding τ = (0, δ1, δ1, 2δ1) throughout; results with other conventions would differ by well-understood terms (see Exciton Berryology).
 
-### 42. Reversing U swaps the valleys, not the pair of values.  
+### 43. Reversing U swaps the valleys, not the pair of values.  
 
 Optional results slide: bias reversal. On the 456-point check grid at loop side 1.5 × 10⁻³ Å⁻¹, U = +100 meV gives λ₋ = −771.27 Å² with a K-polarized eigenvector and λ₊ = +771.27 Å² K′-polarized. At U = −100 meV the values are identical but the valley assignment is swapped: now the negative eigenvalue is K′-like. So the bias reverses the valley-associated sign — just as it reverses the electron valley Chern numbers — while the unordered pair {−λ, +λ} stays the same. This is one reverse-bias test, not a field sweep; I do not draw any curve of λ versus U.
 Second check on the same grid: switching exchange off changes |λ| from 771.3 to 764.8 Å², under 1%, and makes the valley polarization even purer (0.999998). So the curvature belongs to the valley-resolved excitons formed by the direct attraction; exchange's main role is to mix K and K′ in the energy eigenstates, which is exactly why the single-branch curvature comes out near zero.
 
-### 43. The subspace is smooth where its states are not.  
+### 44. The subspace is smooth where its states are not.  
 
 Backup for results slide 4. Left map: for each small loop, the smallest overlap between the energy-sorted lowest state at neighbouring corners. It is 0.98–0.998 away from the centre, but 0.012 for the loop around Q = 0: there the sorted state jumps, so its Abelian Berry phase is undefined. Right map: the smallest singular value of the 2×2 overlap matrix of the doublet, which is at least 0.99956 everywhere: the two-dimensional subspace is transported smoothly.
 Right panel: the lowest four exciton levels along Qx on the 864-point grid. Levels 1 and 2 are split by exchange by only 0.05–0.17 meV on the local map, while the third level is about 9 meV higher. The doublet therefore must be treated as a unit near Γ.
 Away from the centre, where single-branch links are healthy, the Abelian curvature of each branch is below 3.5 × 10⁻⁷ Å² — compatible with zero on this grid — in sharp contrast to the ±300–480 Å² eigenvalues of the doublet at the same points.
 
-### 44. What would turn local geometry into a topological claim.  
+### 45. What would turn local geometry into a topological claim.  
 
 These are the next steps, in rough priority order, and the questions I would like to discuss.
 Global topology first: the present curvature is local. To speak of a topological exciton phase we need the curvature, or Wilson-loop spectra, over the whole exciton Brillouin zone, and we need to know where the doublet stays isolated from higher states; a valley-resolved Chern number only makes sense if the valley decomposition stays well defined.
@@ -262,38 +271,34 @@ Bias: repeat at several U values, and connect U to an applied field with a reali
 Physics and numerics: the listed approximations, each of which could change magnitudes.
 Observable: in a time-reversal-symmetric system the two valleys cancel in any Hall-like response, so an anomalous drift needs valley imbalance, for example from circularly polarized excitation; we should estimate its size. Edge states require a ribbon or domain-wall calculation.
 
-### 45. Two different Berry curvatures, one composite.  
+### 46. Two different Berry curvatures, one composite.  
 
 Concept slide from the proposal, updated. Panel a is the curvature of one electron band over electron momentum k. Panel b is the exciton as a bound composite. Panel c is now computed: the eigenvalues of the 2×2 non-Abelian curvature of the lowest exciton doublet over the pair momentum Q (results slide 3). The key point survives: exciton geometry is a separate quantity and had to be calculated, not read off from electron valley Chern numbers.
 
-### 46. Exciton Berry curvature, defined.  
+### 47. Exciton Berry curvature, defined.  
 
 Superseded. This was the proposal before the calculation: an Abelian, single-band exciton curvature with the electron at k + Q and the hole at k, to be evaluated with Fukui–Hatsugai–Suzuki plaquettes. The calculation showed that the lowest exciton states form a nearly degenerate doublet, so a single-band Abelian curvature is not well defined near Q = 0. The actual calculation uses the symmetric pair coordinate and non-Abelian Wilson loops for the doublet (results slides 1 and 4, Appendix C). Kept for the record.
 
-### 47. Three levels, three kinds of evidence.  
+### 48. Three levels, three kinds of evidence.  
 
 These three claims are often blurred, and each needs different evidence. Ordinary diffusion needs no geometry at all. Sideways drift needs exciton Berry curvature, and edge transport needs a true topological invariant plus modes that survive disorder. None of them has been shown for this project.
 
-### 48. What nonzero exciton curvature would do.  
+### 49. What nonzero exciton curvature would do.  
 
 An exciton is neutral, but if it has an out-of-plane dipole then a spatial gradient of the perpendicular field pushes it in-plane. If an isolated exciton branch has nonzero Berry curvature, that push could produce a sideways velocity, like a Hall effect without charge. This is our proposal, the two valleys would cancel unless populated unequally, and the animation is a schematic rather than a result.
 
-### 49. Closest scientific precedents.  
+### 50. Closest scientific precedents.  
 
 These four papers are the closest work to ours, and none of them is the calculation we propose. One covers the same material but studies polaritons, and another finds exciton Berry curvature on a different graphene platform. The other two are theories of enhanced diffusion and of collective polariton response, which helps define what would be new here.
 
-### 50. Three questions, kept separate.  
+### 51. Three questions, kept separate.  
 
 Conceptual guardrail: Berry curvature, enhanced diffusion, anomalous Hall-like motion and protected edge states are not interchangeable claims.
 
-### 51. From electron bands to exciton motion.  
+### 52. From electron bands to exciton motion.  
 
 Central research-direction slide, proposed and unverified. Start from the electronic eigenstates, solve the electron-hole problem in the biased four-band basis at finite Q, evaluate the exciton Berry curvature, and ask whether a force produces an anomalous velocity. The pseudospin winding characterises the electrons; it does not by itself determine the exciton Chern number, and an electron valley Chern number does not set it.
 
-### 52. From working calculations to a transport claim.  
+### 53. From working calculations to a transport claim.  
 
 Step one is a set of analytic working calculations in Appendix A, not independently validated. Step two formulates the exciton problem at finite Q. Step three computes Omega_X with the plaquette method, the diffusion tensor, the anomalous response and finite-edge spectra, benchmarked against limiting cases. Step four compares with bias-tunable optical or spatial signatures.
-
-### 53. Ateno AX.  
-
-One minute on Ateno, which I co-founded. We are building a dedicated chip for on-device 3D mapping based on Gaussian splatting, for warehouses, mines and tunnels, construction and inspection drones. The FPGA prototype renders a 1080p frame of 173,161 Gaussians; per-frame time went from 1.02 s to 262 ms in ten days. Early stage: no silicon yet, tape-out with design partners is next. The common thread with the physics: understand the structure, then put the computation where it is needed.

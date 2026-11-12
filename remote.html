@@ -61,6 +61,27 @@ button:disabled{opacity:.3}
 #sheet ol{padding-left:20px;margin:0 0 16px}
 #sheet li{margin-bottom:12px}
 #sheet code{display:block;margin:7px 0 6px;padding:9px 11px;border-radius:9px;background:#1c1c1e;font:12px ui-monospace,Menlo,monospace;word-break:break-all}
+#bigpad{background:#4E057E!important;color:#fff!important;font-weight:600;padding:0 14px;border-radius:15px}
+/* full-screen pad for the laser and the pen; on an upright phone it is turned on its side to be big */
+#pad{position:fixed;left:0;top:0;z-index:6;display:none;background:#000;width:100vw;height:100vh;height:100dvh}
+#pad.on{display:flex}
+#pad.turn{width:100vh;width:100dvh;height:100vw;transform-origin:0 0;transform:translateX(100vw) rotate(90deg)}
+#pad{gap:10px;padding:max(10px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom))}
+#pad.turn{padding:10px max(10px,env(safe-area-inset-bottom)) 10px max(10px,env(safe-area-inset-top))}
+#area{flex:1;min-width:0;display:grid;place-items:center}
+#big{position:relative;flex:none;border-radius:8px;background:#fff center/cover no-repeat;touch-action:none;overflow:hidden}
+#big svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+#big path{fill:none;stroke-width:.0037;stroke-linecap:round;stroke-linejoin:round;vector-effect:none}
+#bdot{position:absolute;left:-14px;top:-14px;width:28px;height:28px;border-radius:50%;background:radial-gradient(circle,#fff 0,#ff3b30 26%,rgba(255,59,48,.7) 42%,rgba(255,59,48,0) 72%);opacity:0;pointer-events:none}
+#bdot.on{opacity:1}
+#side{flex:none;width:112px;display:grid;grid-template-columns:1fr 1fr;align-content:center;justify-items:center;gap:8px 6px}
+#side button{width:50px;min-height:40px;border-radius:12px;background:#1c1c1e;color:var(--ink);font-size:12px;font-weight:600;flex:none}
+#side button.on{background:#f5f5f7;color:#000}
+#side .sw{width:30px;height:30px;min-height:30px;border-radius:50%;border:2px solid transparent}
+#side .sw.on{border-color:#fff;box-shadow:0 0 0 2px #000 inset}
+#side hr{grid-column:1/-1;width:90%;border:0;border-top:1px solid #333;margin:2px 0}
+#side .wide{grid-column:1/-1;width:104px}
+#pcount{grid-column:1/-1;font-size:12px;color:var(--ink2);font-variant-numeric:tabular-nums}
 @media (min-width:760px) and (min-height:500px),(orientation:landscape){
   body{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto auto;gap:14px 24px;padding-left:calc(20px + env(safe-area-inset-left));padding-right:calc(20px + env(safe-area-inset-right))}
   header{grid-column:1/-1}
@@ -88,7 +109,27 @@ button:disabled{opacity:.3}
 <div id="tools">
   <button id="black">Black</button>
   <button id="first">First</button>
+  <button id="bigpad">Draw · Point</button>
   <button id="watch">Watch</button>
+</div>
+
+<div id="pad" role="dialog" aria-label="Laser and pen">
+  <div id="area"><div id="big"><svg viewBox="0 0 1 0.5625" preserveAspectRatio="none"></svg><i id="bdot"></i></div></div>
+  <div id="side">
+    <button id="mlaser" class="on">Laser</button>
+    <button id="mpen">Pen</button>
+    <button class="sw" data-c="r" style="background:#FF3B30" aria-label="Red"></button>
+    <button class="sw" data-c="b" style="background:#0D40A6" aria-label="Blue"></button>
+    <button class="sw" data-c="g" style="background:#188038" aria-label="Green"></button>
+    <button class="sw" data-c="y" style="background:#F9AB00" aria-label="Yellow"></button>
+    <button id="undo">Undo</button>
+    <button id="clear">Clear</button>
+    <hr>
+    <button id="pprev">Back</button>
+    <button id="pnext">Next</button>
+    <span id="pcount"></span>
+    <button id="pdone" class="wide">Done</button>
+  </div>
 </div>
 
 <div id="joined"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24"/><path d="m15 27 8 8 15-17"/></svg><b>Connected</b></div>
@@ -136,13 +177,34 @@ button:disabled{opacity:.3}
     notes.append(h, s.notes);
     notes.scrollTop = 0;
     if (slides[n + 1]) new Image().src = `thumbs/${slides[n + 1].id}.jpg`;
+    if (typeof showPad === 'function' && $('pad').classList.contains('on')) showPad();
   }
   const clamp = v => Math.max(0, Math.min(Math.max(slides.length, 1) - 1, v));
 
-  function send(m) {
-    fetch(`${RELAY}${room}?cache=no`, { method: 'POST', body: `${m}~${me}` })
-      .then(r => { if (r.status === 429) status('Limit reached. Use your keyboard', 'bad'); })
-      .catch(() => status('No connection', 'bad'));
+  // Commands go over MQTT first and over ntfy if that is down. The computer answers each one with the
+  // slide it now shows; a command with no answer after 1.5 s is sent again through ntfy, once.
+  let seq = 0, acked = 0, cmdOut = null, cmdIn = null, es = null, esHeard = 0, lastAt = 0;
+  const pending = new Map();
+  const ntfy = body => fetch(`${RELAY}${room}?cache=no`, { method: 'POST', body })
+    .then(r => { if (r.status === 429) status('Relay limit reached · trying the other link', 'bad'); })
+    .catch(() => { if (!cmdOut?.up) status('No connection', 'bad'); });
+  function send(m, retry = true) {
+    const k = ++seq, body = `${m}~${me}~${myName}~${me}.${k}`;
+    const viaLink = cmdOut?.send(body);
+    if (!viaLink) ntfy(body);
+    if (retry) pending.set(k, setTimeout(() => {
+      pending.delete(k);
+      if (k <= acked) return;
+      if (viaLink) ntfy(body);                      // same id: the computer acts on it only once
+      else { live = false; status('Reconnecting…'); }
+    }, 1500));
+  }
+  function ack(mid) {
+    const [who, k] = String(mid || '').split('.');
+    if (who !== me) return;
+    acked = Math.max(acked, +k || 0);
+    pending.forEach((t, j) => { if (j <= acked) { clearTimeout(t); pending.delete(j); } });
+    $('dot').classList.remove('sent'); $('dot').offsetWidth; $('dot').classList.add('sent');   // the computer has the tap
   }
   function press(cmd, change) {
     navigator.vibrate?.(12);
@@ -154,90 +216,204 @@ button:disabled{opacity:.3}
   $('black').onclick = () => press('black', () => { black = !black; });
 
   function hello() {
-    fetch(`${RELAY}${room}?cache=no`, { method: 'POST', body: `hello~${me}~${myName}` }).catch(() => status('No connection', 'bad'));
+    send('hello', false);
     clearTimeout(wait);
     wait = setTimeout(() => { if (!live) status('Open the talk on your computer', 'bad'); }, 7000);
   }
-  function connect() {
-    const es = new EventSource(`${RELAY}${room}/sse`);
-    es.onopen = hello;
-    es.onerror = () => { live = false; status('Reconnecting…'); };
+  function onDeck(text) {
+    const [cmd] = String(text).split('~');
+    if (cmd.startsWith('at:')) {
+      const [, i, b, mode, mid] = cmd.split(':');
+      lastAt = Date.now();
+      ack(mid);
+      if (!pending.size) { n = clamp(+i); black = b === '1'; }    // taps still on their way: keep showing where they lead
+      if (!live) celebrate();
+      live = true;
+      status(mode === 'p' ? 'Connected · Presenter' : 'Connected', 'ok'); show();
+    } else if (cmd === 'hi') hello();                             // the computer just came back
+  }
+  function openNtfy() {
+    es?.close();
+    es = new EventSource(`${RELAY}${room}/sse`);
+    esHeard = Date.now();
+    es.onopen = () => { esHeard = Date.now(); hello(); };
+    es.addEventListener('keepalive', () => { esHeard = Date.now(); });
+    es.onerror = () => {
+      if (!cmdIn?.up) { live = false; status('Reconnecting…'); }
+      if (es.readyState === 2) setTimeout(() => { if (es.readyState === 2) openNtfy(); }, 3000);
+    };
     es.onmessage = e => {
+      esHeard = Date.now();
       let d; try { d = JSON.parse(e.data); } catch { return; }
       if (d.event !== 'message' || seen.has(d.id)) return;
       seen.add(d.id);
       const [cmd, from] = String(d.message).split('~');
-      if (cmd.startsWith('at:')) {
-        const [, i, b, mode] = cmd.split(':');
-        n = clamp(+i); black = b === '1';
-        if (!live) celebrate();
-        live = true;
-        status(mode === 'p' ? 'Connected · Presenter' : 'Connected', 'ok'); show();
-      } else if (cmd === 'hi') {
-        hello();                                          // the computer just came back
-      } else if (from === me) {
-        $('dot').classList.remove('sent'); $('dot').offsetWidth; $('dot').classList.add('sent');   // the relay has the tap
-      } else {
-        if (cmd === 'next') n = clamp(n + 1);
-        else if (cmd === 'prev') n = clamp(n - 1);
-        else if (cmd === 'first') n = 0;
-        else if (cmd === 'black') black = !black;
-        show();
-      }
+      if (cmd.startsWith('at:') || cmd === 'hi') return onDeck(d.message);
+      if (from === me || cmd === 'hello' || cmd === 'ping') return;
+      if (cmd === 'next') n = clamp(n + 1);                       // the Apple Watch or another remote
+      else if (cmd === 'prev') n = clamp(n - 1);
+      else if (cmd === 'first') n = 0;
+      else if (cmd === 'black') black = !black;
+      show();
     };
   }
+  function connect() {
+    openNtfy();
+    cmdIn = window.laserListen?.(`${room}/down`, onDeck, up => { if (up) hello(); }) || null;
+    cmdOut = window.laserSend?.(`${room}/up`, () => {}) || null;
+  }
+  // after the phone sleeps or changes network, check every link and reopen what is dead
+  function revive() {
+    if (!slides.length) return;
+    if (!es || es.readyState === 2 || Date.now() - esHeard > 60000) openNtfy();
+    cmdIn?.kick(); cmdOut?.kick(); sender?.kick?.();
+    hello();
+  }
+  setInterval(() => { if (es && Date.now() - esHeard > 100000) openNtfy(); }, 15000);
+  addEventListener('online', revive);
+  addEventListener('pageshow', e => { if (e.persisted) revive(); });
 
   function celebrate() {
     navigator.vibrate?.([15, 40, 15]);
     $('joined').classList.remove('on'); $('joined').offsetWidth; $('joined').classList.add('on');
   }
-  // tells the computer this page is still here, and that it has left
-  setInterval(() => { if (!document.hidden && live) send('ping'); }, 90000);
-  addEventListener('pagehide', () => { navigator.sendBeacon?.(`${RELAY}${room}?cache=no`, `bye~${me}`); });
+  // tells the computer this page is still here (and learns that the computer is), and that it has left
+  setInterval(() => {
+    if (document.hidden || !slides.length) return;
+    if (cmdOut?.up) send('ping', false); else if (live && Date.now() - lastAt > 80000) send('ping', false);   // spare the ntfy daily limit
+    if (live && Date.now() - lastAt > 100000) { live = false; status('Reconnecting…'); revive(); }
+  }, 40000);
+  addEventListener('pagehide', () => { cmdOut?.send(`bye~${me}`); navigator.sendBeacon?.(`${RELAY}${room}?cache=no`, `bye~${me}`); });
 
-  // laser: the finger on the slide preview is the dot on the slide
-  const pad = $('thumb'), ldot = $('ldot');
-  let sender = null, linkUp = false, aim = null, sendT = 0, lastSent = 0;
+  // laser and pen: the finger on the slide preview (small, or the big turned-sideways pad) is the dot on the slide
+  const pad = $('thumb'), ldot = $('ldot'), big = $('big'), bdot = $('bdot'), padEl = $('pad'), inkSvg = big.querySelector('svg');
+  let sender = null, linkUp = false, aim = null, sendT = 0, tool = 'laser', colour = 'r';
+  const inkQueue = [];                    // finished strokes, undo and clear wait for the link if it is down
+  const inkSend = m => {
+    if (!sender?.send(m)) { inkQueue.push(m); if (inkQueue.length > 40) inkQueue.shift(); return; }
+    [350, 1200].forEach(t => setTimeout(() => sender?.send(m), t));   // the free brokers drop the odd message; copies are ignored
+  };
   const openLink = () => {
     if (sender) return;
     sender = window.laserSend?.(`${room}/laser`, up => {
       linkUp = up;
-      if (!localStorage.getItem('cqts-laser-used') || !up) $('lhint').textContent = up ? 'Drag on the slide to point' : 'Laser unavailable on this network';
+      if (up) inkQueue.splice(0).forEach(m => sender.send(m));
+      if (!localStorage.getItem('cqts-laser-used') || !up) $('lhint').textContent = up ? 'Drag on the slide to point · Draw for a big pad' : 'Laser unavailable on this network';
     }) || null;
   };
-  function aimAt(e) {
-    const r = pad.getBoundingClientRect();
-    const x = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)), y = Math.max(0, Math.min(1, (e.clientY - r.top) / r.height));
-    aim = `${x.toFixed(3)},${y.toFixed(3)}`;
-    ldot.style.transform = `translate(${x * r.width}px,${y * r.height}px)`;
+  const turned = () => padEl.classList.contains('turn');
+  // finger position in 0–1 of the slide; the turned pad is rotated 90° clockwise on the screen
+  function where(e, el) {
+    const r = el.getBoundingClientRect();
+    const u = el === big && turned() ? (e.clientY - r.top) / r.height : (e.clientX - r.left) / r.width;
+    const v = el === big && turned() ? (r.right - e.clientX) / r.width : (e.clientY - r.top) / r.height;
+    return [Math.max(0, Math.min(1, u)), Math.max(0, Math.min(1, v))];
   }
-  // 12 updates a second is what the free relay carries without dropping any
+  const fmt = p => `${p[0].toFixed(4)},${p[1].toFixed(4)}`;
+  function placeDot(el, dot, p) {
+    const w = el === big && turned() ? el.offsetWidth : el.getBoundingClientRect().width;
+    const h = el === big && turned() ? el.offsetHeight : el.getBoundingClientRect().height;
+    dot.style.transform = `translate(${p[0] * w}px,${p[1] * h}px)`;
+  }
+  // 12 laser updates a second is what the free relay carries without dropping any
   const pump = () => {
     if (aim === null) return;
     sender?.send(aim); sendT = setTimeout(pump, 80);
   };
-  pad.addEventListener('pointerdown', e => {
+
+  // ink on this phone, per slide, mirrors what the computer shows
+  const inks = new Map();
+  let stroke = null, sentUpTo = 0, inkT = 0, chunk = 0;
+  const pathOf = pts => pts.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(4)} ${(p[1] * .5625).toFixed(4)}`).join('') + (pts.length === 1 ? 'l.0005 0' : '');
+  const INK = { r: '#FF3B30', b: '#0D40A6', g: '#188038', y: '#F9AB00' };
+  function drawInk() {
+    inkSvg.replaceChildren(...(inks.get(n) || []).map(st => {
+      const e = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      e.setAttribute('d', pathOf(st.pts)); e.setAttribute('stroke', INK[st.c]); st.el = e; return e;
+    }));
+  }
+  const flushInk = () => {
+    if (!stroke) return;
+    const fresh = stroke.pts.slice(Math.max(0, sentUpTo - 1));
+    if (fresh.length > (sentUpTo ? 1 : 0)) { sender?.send(`k:${stroke.id}:${stroke.c}:${fresh.map(fmt).join(';')}:${++chunk}`); sentUpTo = stroke.pts.length; }
+    inkT = setTimeout(flushInk, 70);
+  };
+
+  function down(e, el, dot) {
     openLink();
-    try { pad.setPointerCapture(e.pointerId); } catch {}
-    aimAt(e); ldot.classList.add('on');
+    try { el.setPointerCapture(e.pointerId); } catch {}
     navigator.vibrate?.(8);
     localStorage.setItem('cqts-laser-used', '1');
     if (linkUp) $('lhint').textContent = '';
+    const p = where(e, el);
+    if (el === big && tool === 'pen') {
+      stroke = { id: `${me}${Date.now().toString(36)}`, c: colour, pts: [p] }; sentUpTo = 0;
+      if (!inks.has(n)) inks.set(n, []);
+      inks.get(n).push(stroke); drawInk();
+      clearTimeout(inkT); flushInk();
+      return;
+    }
+    aim = fmt(p); placeDot(el, dot, p); dot.classList.add('on');
     clearTimeout(sendT); pump();
-  });
-  pad.addEventListener('pointermove', e => { if (aim !== null) aimAt(e); });
-  const lift = () => {
+  }
+  function move(e, el, dot) {
+    if (stroke && el === big) {
+      const p = where(e, el), q = stroke.pts[stroke.pts.length - 1];
+      if (Math.hypot(p[0] - q[0], (p[1] - q[1]) * .5625) < .0015) return;
+      stroke.pts.push(p); stroke.el?.setAttribute('d', pathOf(stroke.pts));
+      return;
+    }
     if (aim === null) return;
-    aim = null; clearTimeout(sendT); ldot.classList.remove('on');
+    const p = where(e, el); aim = fmt(p); placeDot(el, dot, p);
+  }
+  function up(el, dot) {
+    if (stroke && el === big) {
+      clearTimeout(inkT);
+      const msg = `K:${stroke.id}:${stroke.c}:${stroke.pts.map(fmt).join(';')}`;
+      inkSend(msg);
+      stroke = null; return;
+    }
+    if (aim === null) return;
+    aim = null; clearTimeout(sendT); dot.classList.remove('on');
     sender?.send('off');
-  };
-  pad.addEventListener('pointerup', lift);
-  pad.addEventListener('pointercancel', lift);
+  }
+  [[pad, ldot], [big, bdot]].forEach(([el, dot]) => {
+    el.addEventListener('pointerdown', e => down(e, el, dot));
+    el.addEventListener('pointermove', e => move(e, el, dot));
+    el.addEventListener('pointerup', () => up(el, dot));
+    el.addEventListener('pointercancel', () => up(el, dot));
+  });
+
+  // the big pad
+  function fitPad() {
+    padEl.classList.toggle('turn', innerHeight > innerWidth);
+    const a = $('area'), w = a.clientWidth, h = a.clientHeight;      // layout size, before the turn
+    const k = Math.min(w / 16, h / 9);
+    big.style.width = `${Math.floor(16 * k)}px`; big.style.height = `${Math.floor(9 * k)}px`;
+  }
+  addEventListener('resize', fitPad);
+  function showPad() {
+    const s = slides[n];
+    if (s) big.style.backgroundImage = `url(thumbs/${s.id}.jpg)`;
+    $('pcount').textContent = slides.length ? `${n + 1} / ${slides.length}` : '';
+    $('pprev').disabled = n <= 0; $('pnext').disabled = slides.length && n >= slides.length - 1;
+    drawInk();
+  }
+  const setTool = t => { tool = t; $('mlaser').classList.toggle('on', t === 'laser'); $('mpen').classList.toggle('on', t === 'pen'); padEl.querySelectorAll('.sw').forEach(b => b.classList.toggle('on', t === 'pen' && b.dataset.c === colour)); };
+  $('bigpad').onclick = () => { openLink(); padEl.classList.add('on'); fitPad(); showPad(); };
+  $('pdone').onclick = () => padEl.classList.remove('on');
+  $('mlaser').onclick = () => setTool('laser');
+  $('mpen').onclick = () => setTool('pen');
+  padEl.querySelectorAll('.sw').forEach(b => { b.onclick = () => { colour = b.dataset.c; setTool('pen'); }; });
+  $('undo').onclick = () => { inks.get(n)?.pop(); drawInk(); inkSend(`z:${me}${Date.now()}`); };
+  $('clear').onclick = () => { inks.delete(n); drawInk(); inkSend(`c:${me}${Date.now()}`); };
+  $('pprev').onclick = () => $('prev').click();
+  $('pnext').onclick = () => $('next').click();
 
   // keep the screen awake while presenting
   let lock;
   const stayAwake = async () => { try { lock = await navigator.wakeLock?.request('screen'); } catch {} };
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) { stayAwake(); if (slides.length) hello(); } });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) { stayAwake(); revive(); } });
   stayAwake();
 
   // titles and notes come from the deck itself, so this page never goes out of date

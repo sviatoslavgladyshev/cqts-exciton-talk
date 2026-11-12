@@ -1,3 +1,24 @@
+# Changelog — second revision (November 2026)
+
+## Slides
+- **13 · What was computed:** the pipeline boxes pop in one by one and each arrow draws itself after its box; a dot then keeps travelling along every arrow while the slide is showing.
+- **14 · Exciton energies:** redesigned as one large energy ladder drawn to scale (continuum, next states, the lowest pair), with the binding energy (22.8 meV) and the gap (9.3 meV) on animated brackets, and a card with the exciton bands E(Qₓ) drawn in from the 864-point data. Replaces the static level PNG and the list of numbers.
+- **15 · Exciton Berry curvature:** the two maps are now 5 × 5 tiles built in the slide from `lattice_local_map.npz`, popping in from the centre outwards; plain-language text (opposite signs in the two valleys, near Q = 0 only, computed as a pair). Map titles still read “Non-Abelian curvature eigenvalue λ₋ / λ₊”. Notes start with a plain spoken version; the technical text follows for questions.
+- **19 · Ateno AX:** moved from the end of the backup into the main talk, just before the conclusion (0:30). New dark design with the chip render, a Gaussian-splat video and map pictures from the Ateno website (`assets/ateno/`). The appendix loses section E.
+- Timing: results validation and conclusion 0:45 each, so the main talk still adds up to 20:00. Slides from 19 on are renumbered; main talk 1–20, sources 21, backup 22–53.
+- Build-in engine: new `wipe` (draws in from the left) and `drop` effects, fractional order numbers; videos restart when their slide is entered.
+
+## Presenting
+- **Projector reconnect:** in Presenter mode, when a display is unplugged and plugged back in, the slides window is moved back onto it automatically; if the browser refuses, the next key or clicker press does it. New *Send slides to display* button in the presenter header and key **S**.
+- **Phone remote reliability:** commands now go over two public MQTT brokers at once, with ntfy.sh only as a fallback (its 250-messages-a-day limit per network was the main cause of the remote dropping out). Every command is acknowledged by the computer with the current slide; unanswered commands are resent once through ntfy. Dead links after the phone sleeps or changes network are detected and reopened.
+- **Drawing:** *Draw · Point* on the phone opens a full-screen pad, turned sideways on an upright phone (about 3× the area of the preview), with laser, pen in four colours, Undo and Clear. Ink appears on the projector and the presenter view and stays on its slide; **E** clears it from the keyboard.
+
+## Checks
+- Every slide rendered at 1920 × 1080 with no overflow and no console errors; interaction tests pass (navigation, grid, notes, presenter, links, animation, remote).
+- Remote tested end to end on the real relays: with MQTT, and with MQTT blocked on the phone (ntfy fallback); both move the deck in under 1.2 s and keep two phones in step. Pen strokes, Undo and Clear arrived in 4 of 4 runs.
+
+---
+
 # Changelog — results revision (November 2026)
 
 The talk no longer proposes an exciton Berry-curvature calculation; it presents the completed lattice finite-Q BSE calculation from `BLG_multiband_Berry/`.
