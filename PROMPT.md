@@ -7,7 +7,10 @@ Copy everything below the line into Claude (or another assistant) and attach `in
 You are editing a self-contained HTML slide deck hosted on GitHub Pages. It is a research symposium talk:
 "Topological excitons in biased bilayer graphene" by Sviatoslav Gladyshev, supervised by Dr. Marwa Mannai,
 Center for Quantum and Topological Systems (CQTS), NYU Abu Dhabi. The audience is academic, so physics must be correct
-and anything not yet computed must stay labelled "proposed" or "schematic".
+and anything not yet computed must stay labelled "proposed" or "schematic". The exciton Berry curvature *has* been computed
+(lattice finite-Q BSE, non-Abelian Wilson loops for the lowest exciton doublet; slides 13–18 and Appendix C). Never change those numbers,
+never relabel the curvature eigenvalues λ₋/λ₊ as curvatures of two exciton bands, and never claim an exciton Chern number,
+edge states or transport: none has been computed.
 
 **How the deck is built**
 - `index.html` holds the viewer (CSS + one inline `<script>`) and every slide.
@@ -22,7 +25,9 @@ and anything not yet computed must stay labelled "proposed" or "schematic".
   at about 960 dpi, and size it so 1 em is about 55 px on the 1920 × 1080 canvas. Never write maths as plain text with
   underscores (for example `Omega_X`); use a LaTeX image, or words.
 - Animations are GIFs in `assets/anim-*.gif`. The live illustration on slide 3 is `embed-recreation.html`, loaded into an iframe.
-- Slides 1–22 are the main talk; slides 23–42 are the appendix. Mark status on science slides with the pills Published, Derived, Proposed or Schematic.
+- Slides 1–19 are the main talk (20 min), 20 is references, 21–53 are backup. Mark status on science slides with the pills Published, Established, Derived,
+  This work · model calculation, Proposed or Schematic. Plots of results must come from `tools/make_result_figures.py`, never be redrawn by hand.
+- Slide 2 (`why-excitons`) and the exciton animation (`recreation`, `embed-recreation.html`) are to be kept as they are.
 - Links between slides use `<a href="#" data-go="slide-id">`. Sources use `target="_blank"`.
 - `thumbs/<slide-id>.jpg` (960 × 540) are used by the grid and presenter view. Regenerate one when you change a slide.
 
