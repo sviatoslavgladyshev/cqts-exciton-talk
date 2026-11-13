@@ -80,7 +80,7 @@ thumbs/                 slide thumbnails for the grid and presenter view
 fonts/                  Roboto (self-hosted)
 latex/                  LaTeX source of added equations (results-equations.tex for the results section)
 tools/                  make_result_figures.py (plots from the calculation outputs), make_equations.py (renders eq-r-*.png)
-docs/                   speaker notes, changelog, results summary for review, applications context and next steps
+docs/                   talk script, speaker notes, changelog, results summary for review, applications context and next steps
 PROMPT.md               prompt for asking an AI assistant to edit or extend this deck
 ```
 
