@@ -8,7 +8,7 @@ You are editing a self-contained HTML slide deck hosted on GitHub Pages. It is a
 "A Tale of Two Valleys: The Hidden Geometry of Excitons" (on topological excitons in biased bilayer graphene) by Sviatoslav Gladyshev, supervised by Dr. Marwa Mannai,
 Center for Quantum and Topological Systems (CQTS), NYU Abu Dhabi. The audience is academic, so physics must be correct
 and anything not yet computed must stay labelled "proposed" or "schematic". The exciton Berry curvature *has* been computed
-(lattice finite-Q BSE, non-Abelian Wilson loops for the lowest exciton doublet; slides 13–18 and Appendix C). Never change those numbers,
+(lattice finite-Q BSE, non-Abelian Wilson loops for the lowest exciton doublet; slides 14–19 and Appendix C). Never change those numbers,
 never relabel the curvature eigenvalues λ₋/λ₊ as curvatures of two exciton bands, and never claim an exciton Chern number,
 edge states or transport: none has been computed.
 
@@ -24,8 +24,8 @@ edge states or transport: none has been computed.
   LaTeX (standalone class, Computer Modern, ink colour #202124, accent colour #0D40A6), render a PNG with a transparent background
   at about 960 dpi, and size it so 1 em is about 55 px on the 1920 × 1080 canvas. Never write maths as plain text with
   underscores (for example `Omega_X`); use a LaTeX image, or words.
-- Animations are GIFs in `assets/anim-*.gif`. The live illustration on slide 3 is `embed-recreation.html`, loaded into an iframe.
-- Slides 1–20 are the main talk (20 min; 19 is Ateno, 20 the conclusion), 21 is references, 22–53 are backup. Mark status on science slides with the pills Published, Established, Derived,
+- Animations are GIFs in `assets/anim-*.gif`. The live illustration on slide 9 is `embed-recreation.html`, loaded into an iframe.
+- Slides 1–22 are the main talk (20 min; 3–5 devices and bilayer-graphene cavities, 20 application proposals, 21 Ateno, 22 the conclusion), 23 is references, 24–57 are backup. Keep the device and polariton physics (photonic spin–orbit coupling, cavity-mediated binding) clearly separate from the exciton Berry curvature, and label proposals as proposals. Mark status on science slides with the pills Published, Established, Derived,
   This work · model calculation, Proposed or Schematic. Plots of results must come from `tools/make_result_figures.py`, never be redrawn by hand.
 - Slide 2 (`why-excitons`) and the exciton animation (`recreation`, `embed-recreation.html`) are to be kept as they are.
 - Links between slides use `<a href="#" data-go="slide-id">`. Sources use `target="_blank"`.

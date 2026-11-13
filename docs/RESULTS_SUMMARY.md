@@ -57,6 +57,10 @@ Gauge checks: random electronic phases change λ by 6 × 10⁻¹⁰ Å²; random
 - **Large-plaquette map.** `lattice_map_map.npz` contains a 4 × 4 map with very large single-branch values (about 10⁵ Å² where links are about 10⁻⁸). It is not described in the reports and is not used in the talk, except for its exciton energies along Q_x.
 - **Notebook not reviewed.** `lattice_research.ipynb` was not reviewed for the talk. The figures were regenerated from the `.npz` and `.json` outputs with `tools/make_result_figures.py`.
 
+## Application context
+
+The talk now opens with room-temperature exciton and polariton devices, the WS₂ spin-current experiment (Shang et al., *Nat. Mater.* 2026) and bilayer graphene in a terahertz cavity (Helmrich et al., *Nature* 2026), and closes with two proposed directions: valley-dependent exciton transport and bias-tunable BLG exciton-polaritons. None of these is a result of this work. The connections, the differences in mechanism and the computational steps each direction would need are in `APPLICATIONS.md`.
+
 ## Questions for discussion
 
 1. Which closed-path or full-zone calculation would be the convincing test of a global exciton invariant?

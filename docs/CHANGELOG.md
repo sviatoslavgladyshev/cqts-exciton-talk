@@ -1,3 +1,45 @@
+# Changelog — third revision: applications (November 2026)
+
+Prompted by Dr. Marwa Mannai's suggestion to address the physical applications of the work, starting from Shang et al., *Nat. Mater.* (2026).
+Deck: 57 slides. Main talk 1–22 (20:00), references 23, backup 24–57. The calculation, its numbers and figures are unchanged.
+
+## Main talk
+
+| # | Slide (`id`) | Status | Time |
+|---|---|---|---|
+| 1 | A Tale of Two Valleys (`cover`) | Retained; notes preview the new arc | 0:20 |
+| 2 | Why excitons? (`why-excitons`) | **Retained unchanged** | 0:40 |
+| 3 | Excitons and polaritons already carry information (`devices`) | **New**, replaces the two earlier device slides: four room-temperature experiments (Jiang, Tassan, Shi, Jin) with animated icons and experiment/material/particle tags | 1:00 |
+| 4 | Spin information travels 92 µm at room temperature (`shang`) | **New**: Shang et al. 2026, measured polarization maps from the research briefing, the bright/dark/TE–TM mechanism in three steps, and an explicit “different physics from ours” box | 1:15 |
+| 5 | Bilayer graphene already works inside a cavity (`why-blg`) | **New**: Helmrich et al. 2026 (experiment, real spectra) next to Duarte et al. 2025 (theory, real dispersion at 100 meV bias) | 0:45 |
+| 6–8 | Hamiltonian, bands and gap, electron Berry curvature | Retained, retimed 1:10 / 1:05 / 1:30 | 3:45 |
+| 9 | Exciton animation (`recreation`) | **Retained unchanged** | 0:45 |
+| 10–11 | Composite boson, finite-Q BSE | Retained, retimed 0:30 / 1:20 | 1:50 |
+| 12 | Bright, dark, and a field-driven crossing (`dark-bright`) | Modified: one line linking dark excitons to the WS₂ device, with the caveat that the mechanism differs | 1:10 |
+| 13–19 | Results: question, model, energies, curvature, non-Abelian, validation, meaning | Retained; model, non-Abelian and validation retimed 1:00 / 1:00 / 0:30 | 6:00 |
+| 20 | Can exciton geometry steer information? (`steer`) | **New**, proposal pill: A valley-dependent transport (animated drift cartoon), B tunable BLG exciton-polaritons (animated anticrossing), what each would need, links back to slides 3–5 | 1:15 |
+| 21 | Ateno AX (`ateno`) | Retained, shortened | 0:20 |
+| 22 | Conclusion (`takeaway`) | Modified: four categories now include polariton/cavity work and the open application question | 0:55 |
+| 23 | Sources (`references`) | Modified: three columns (foundations, experiments, theory); added Shang, the briefing, Helmrich, Shi | — |
+
+## Moved
+- `devices-1` and `devices-2` (the earlier two device slides, including PolArt and Thompson et al.) moved to backup D, after `roadmap`, without timing cues. Their content is merged into slide 3 and the Thompson reference into slide 20.
+
+## External figures and licences
+- `assets/ext-shang-8fold.jpg`, `assets/ext-shang-100um.jpg`: polarization maps cropped from Fig. 1 of the Nature Materials research briefing, © 2026 Shang, Q. et al. **Not openly licensed**; credited on the slide. Ask the authors or Springer Nature before reusing outside the talk.
+- `assets/ext-helmrich-spectra.png`: Fig. 3a-equivalent panel from arXiv:2408.00189 (published in *Nature* 654, 361 (2026) under CC BY 4.0).
+- `assets/ext-duarte-fig4.png`: Fig. 4 of arXiv:2502.06640 (CC BY 4.0), published as *Phys. Rev. B* 111, 075411 (2025).
+- Jin et al. (CC BY-NC-ND), Tassan et al. and Thompson et al. (CC BY) are cited but no figures are reused; Shi et al. and Jiang et al. are not open access and are cited only.
+
+## Verified sources
+All DOIs resolved and checked against Europe PMC metadata and abstracts (authors, journal, volume, pages, date, licence). Claims on the slides are taken from the abstracts, the briefing (provided as PDF), or the open full text (Helmrich, Duarte).
+
+## Checks
+- All 57 slides rendered at 1920 × 1080: no overflow (Ateno zoom is the known false positive), no console errors; thumbnails regenerated.
+- Interaction tests pass: navigation, jump by number, build-ins, notes, grid chapters, all `data-go` targets, exciton animation, images, presenter view, remote page, results animations, Ateno video.
+
+---
+
 # Changelog — second revision (November 2026)
 
 ## Slides
